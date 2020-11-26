@@ -40,18 +40,6 @@ namespace AntiLagMod
         private bool activePause = false;
         private bool waitThenActiveFireOnce;
 
-        StandardLevelGameplayManager _gameplayManager;
-        StandardLevelGameplayManager gameplayManager
-        {
-            get
-            {
-                if (_gameplayManager == null)
-                {
-                    _gameplayManager = Resources.FindObjectsOfTypeAll<StandardLevelGameplayManager>().FirstOrDefault();
-                }
-                return _gameplayManager;
-            }
-        }
         public static PauseController PauseController;
 
         #endregion
@@ -85,7 +73,7 @@ namespace AntiLagMod
             if (isLevel && modEnabled)
             {
 
-                Plugin.Log.Debug("FR: " + frameRate);
+                //Plugin.Log.Debug("FR: " + frameRate);
                 if (waitThenActiveFireOnce)
                 {
                     StartCoroutine(WaitThenActive());
@@ -96,6 +84,7 @@ namespace AntiLagMod
                 {
                     activePause = false;
                     PauseController.Pause();
+                    Plugin.Log.Warn("FPS DROP DETECTED");
                 }
 
                 if (!activePause)

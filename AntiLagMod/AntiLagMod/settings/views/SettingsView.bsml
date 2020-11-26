@@ -14,7 +14,7 @@
         <bool-setting value="frame-drop-enabled" hover-hint="Pause the game after a threshold of frames are dropped?" text="Frame Drop Detection" apply-on-change="true"></bool-setting>
       </horizontal>
       <horizontal horizontal-fit="PreferredSize">
-        <slider-setting text="Frame Drop Threshold" apply-on-change="true" value="frame-drop-threshold" min="5" max="~max-framerate" increment="1" hover-hint="After how many frames are dropped should the mod pause the game?"></slider-setting>
+        <slider-setting text="Frame Drop Threshold" apply-on-change="true" value="frame-drop-threshold" min="5" max="~max-framerate" increment="1" hover-hint="Pause the game after game framerate drops below this number"></slider-setting>
       </horizontal>
       <horizontal>
         <slider-setting text="Detection Delay" apply-on-change="true" value="wait-then-active" min="0" max="10" increment="0.5" hover-hint="Start waiting for lag spikes after this many seconds"></slider-setting>
