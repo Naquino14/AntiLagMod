@@ -85,7 +85,7 @@ namespace AntiLagMod
             if (isLevel && modEnabled)
             {
 
-                //Plugin.Log.Debug("FR: " + frameRate);
+                Plugin.Log.Debug("FR: " + frameRate);
                 if (waitThenActiveFireOnce)
                 {
                     StartCoroutine(WaitThenActive());

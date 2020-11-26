@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "l9PecmKBeCktg/4jiSmkEc6mvs+Wk1KuvlOxQf2IMS1lw7w/jFo+RqHedCzUKf+FsG1WS1lnwM9BvE4moUMKZQ==",
+  "dgSpecHash": "zFYfM7UcpvkCs4pt0TX7g0gSQxh8wyGOSlU8dDa85WIYw34S/bvvQWpapTDDbnARn2tndNYW0JXsAJons2e+ew==",
   "success": true,
-  "projectFilePath": "D:\\CSharp Projects\\Anti Lag Mod\\Anti-Lag-Mod\\AntiLagMod\\AntiLagMod\\AntiLagMod.csproj",
+  "projectFilePath": "D:\\CSharp Projects\\Anti Lag Mod\\AntiLagMod\\AntiLagMod\\AntiLagMod\\AntiLagMod.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\naqui\\.nuget\\packages\\beatsabermoddingtools.tasks\\1.2.3\\beatsabermoddingtools.tasks.1.2.3.nupkg.sha512",
     "C:\\Users\\naqui\\.nuget\\packages\\microsoft.build.framework\\16.5.0\\microsoft.build.framework.16.5.0.nupkg.sha512",

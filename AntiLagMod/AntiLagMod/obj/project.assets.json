@@ -1026,11 +1026,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\CSharp Projects\\Anti Lag Mod\\Anti-Lag-Mod\\AntiLagMod\\AntiLagMod\\AntiLagMod.csproj",
+      "projectUniqueName": "D:\\CSharp Projects\\Anti Lag Mod\\AntiLagMod\\AntiLagMod\\AntiLagMod\\AntiLagMod.csproj",
       "projectName": "AntiLagMod",
-      "projectPath": "D:\\CSharp Projects\\Anti Lag Mod\\Anti-Lag-Mod\\AntiLagMod\\AntiLagMod\\AntiLagMod.csproj",
+      "projectPath": "D:\\CSharp Projects\\Anti Lag Mod\\AntiLagMod\\AntiLagMod\\AntiLagMod\\AntiLagMod.csproj",
       "packagesPath": "C:\\Users\\naqui\\.nuget\\packages\\",
-      "outputPath": "D:\\CSharp Projects\\Anti Lag Mod\\Anti-Lag-Mod\\AntiLagMod\\AntiLagMod\\obj\\",
+      "outputPath": "D:\\CSharp Projects\\Anti Lag Mod\\AntiLagMod\\AntiLagMod\\AntiLagMod\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "configFilePaths": [
