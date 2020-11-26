@@ -1,0 +1,41 @@
+﻿<bg xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd">
+  <vertical child-control-height="false">
+    <horizontal bg="panel-top" pad-left="10" pad-right="10" horizontal-fit="PreferredSize">
+      <text text="Anti Lag Mod Settings" align="Center" font-size="10"></text>
+    </horizontal>
+    <vertical vertical-fit="PreferredSize">
+      <horizontal horizontal-fit="PreferredSize">
+        <bool-setting value="mod-enabled" hover-hint="Enable Anti Lag Mod?" text="Anti Lag Mod Enabled" apply-on-change="true"></bool-setting>
+      </horizontal>
+      <horizontal horizontal-fit="PreferredSize">
+        <text text="Frame Drop Threshold"></text>
+      </horizontal>
+      <horizontal horizontal-fit="PreferredSize">
+        <bool-setting value="frame-drop-enabled" hover-hint="Pause the game after a threshold of frames are dropped?" text="Frame Drop Detection" apply-on-change="true"></bool-setting>
+      </horizontal>
+      <horizontal horizontal-fit="PreferredSize">
+        <slider-setting text="Frame Drop Threshold" apply-on-change="true" value="frame-drop-threshold" min="5" max="~max-framerate" increment="1" hover-hint="After how many frames are dropped should the mod pause the game?"></slider-setting>
+      </horizontal>
+      <horizontal>
+        <slider-setting text="Detection Delay" apply-on-change="true" value="wait-then-active" min="0" max="10" increment="0.5" hover-hint="Start waiting for lag spikes after this many seconds"></slider-setting>
+      </horizontal>
+      <horizontal horizontal-fit="PreferredSize">
+        <text text="Drift Detection"></text>
+      </horizontal>
+      <horizontal horizontal-fit="PreferredSize">
+        <bool-setting value="drift-detection-enabled" hover-hint="Enable Drift Detection?" text="Drift Detection (Coming Soon!)" apply-on-change="true"></bool-setting>
+      </horizontal>
+      <horizontal>
+        <slider-setting text="bounding box size" apply-on-change="true" value="drift-threshold" min="~bb-min" max="~bb-max" increment="0.5" hover-hint="Pause the game after controllers leave box of this size."></slider-setting>
+      </horizontal>
+      <horizontal horizontal-fit="PreferredSize">
+        <button text="Save" hover-hint="Save and apply your settings." on-click="save"></button>
+        <vertical pad-left="1" pad-right="1"></vertical>
+        <button text="More Info | Report a bug" hover-hint="Click to open the Repo page." on-click="more-info"></button>
+      </horizontal>
+      <horizontal horizontal-fit="PreferredSize">
+        <text text="Dedicated to my laptop's GTX 1050 Mobile" font-size="2"></text>
+      </horizontal>
+    </vertical>
+  </vertical>
+</bg>

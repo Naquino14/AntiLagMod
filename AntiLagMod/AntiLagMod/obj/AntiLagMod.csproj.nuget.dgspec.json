@@ -1,0 +1,59 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\CSharp Projects\\Anti Lag Mod\\Anti-Lag-Mod\\AntiLagMod\\AntiLagMod\\AntiLagMod.csproj": {}
+  },
+  "projects": {
+    "D:\\CSharp Projects\\Anti Lag Mod\\Anti-Lag-Mod\\AntiLagMod\\AntiLagMod\\AntiLagMod.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\CSharp Projects\\Anti Lag Mod\\Anti-Lag-Mod\\AntiLagMod\\AntiLagMod\\AntiLagMod.csproj",
+        "projectName": "AntiLagMod",
+        "projectPath": "D:\\CSharp Projects\\Anti Lag Mod\\Anti-Lag-Mod\\AntiLagMod\\AntiLagMod\\AntiLagMod.csproj",
+        "packagesPath": "C:\\Users\\naqui\\.nuget\\packages\\",
+        "outputPath": "D:\\CSharp Projects\\Anti Lag Mod\\Anti-Lag-Mod\\AntiLagMod\\AntiLagMod\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\naqui\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net472": {
+          "dependencies": {
+            "BeatSaberModdingTools.Tasks": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.2.3, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}
