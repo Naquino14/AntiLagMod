@@ -23,7 +23,7 @@
         <text text="Tracking Issue Detection"></text>
       </horizontal>
       <horizontal horizontal-fit="PreferredSize">
-        <bool-setting value="drift-detection-enabled" hover-hint="Enable Tracking Ussue Detection?" text="Drift Detection (Coming Soon!)" apply-on-change="true"></bool-setting>
+        <bool-setting value="drift-detection-enabled" hover-hint="Enable Tracking Ussue Detection?" text="Tracking Issue Detection" apply-on-change="true"></bool-setting>
       </horizontal>
       <horizontal>
         <slider-setting text="bounding box size" apply-on-change="true" value="drift-threshold" min="~bb-min" max="~bb-max" increment="0.5" hover-hint="Pause the game after controllers leave box of this size."></slider-setting>
