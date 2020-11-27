@@ -33,15 +33,16 @@ namespace AntiLagMod
         private bool isLevel;
         private bool test = true;
 
-        private DateTime lastTime;
-        private int framesRendered;
         private int frameRate;
+        private int frameCounter = 0;
+        private float timeCounter = 0.0f;
+        private float lastFrameRate;
+        private float refreshRate = 0.25f;
 
         private bool activePause = false;
         private bool waitThenActiveFireOnce;
 
         public static PauseController PauseController;
-
         #endregion
 
         #region Monobehaviour Messages
@@ -70,28 +71,33 @@ namespace AntiLagMod
         {
             CheckFrameRate();
             CheckEvents();
-            if (isLevel && modEnabled)
+            if (isLevel && modEnabled && frameDropDetection)
             {
 
-                //Plugin.Log.Debug("FR: " + frameRate);
+                Plugin.Log.Debug("FR: " + frameRate);
                 if (waitThenActiveFireOnce)
                 {
                     StartCoroutine(WaitThenActive());
                     waitThenActiveFireOnce = false;
                 }
-
                 if (activePause && (frameRate < frameThreshold))
                 {
                     activePause = false;
-                    PauseController.Pause();
-                    Plugin.Log.Warn("FPS DROP DETECTED");
+                    //PauseController.Pause(); // disable for debug
+                    //Plugin.Log.Warn("FPS DROP DETECTED");
                 }
-
                 if (!activePause)
                 {
                     PauseController.didResumeEvent += OnLevelResume;
                 }
                     
+            }
+        }
+        private void FixedUpdate()
+        {
+            if (isLevel && modEnabled)
+            {
+                //
             }
         }
         private void OnEnable()
@@ -115,17 +121,19 @@ namespace AntiLagMod
             Instance.frameThreshold = Configuration.FrameThreshold;
             Instance.waitThenActiveTime = Configuration.WaitThenActive;
         }
-
         private void CheckFrameRate()
         {
-            framesRendered++;
-            if((DateTime.Now - lastTime).TotalSeconds >= 1)
+            if (frameCounter < refreshRate)
             {
-                // one second elapsed
-                frameRate = framesRendered;
-                framesRendered = 0;
-                lastTime = DateTime.Now;
+                timeCounter += Time.deltaTime;
+                frameCounter++;
+            } else
+            {
+                lastFrameRate = frameCounter / timeCounter;
+                frameCounter = 0;
+                timeCounter = 0.0f;
             }
+            frameRate = (int)lastFrameRate; // cast lastFrameRate as an int;
         }
 
         private IEnumerator WaitThenActive() // wait a certain amount of time before activating the pause mechanism
