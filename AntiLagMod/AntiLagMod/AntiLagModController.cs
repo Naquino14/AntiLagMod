@@ -90,7 +90,6 @@ namespace AntiLagMod
                 Refresh();
             waitThenActiveFireOnce = true;
             trackingActiveFireOnce = true;
-            FindSabers();
         }
         private void Update()
         {
@@ -135,7 +134,7 @@ namespace AntiLagMod
                         CheckSaberPos("first");
                     }
                     framesSinceLastSaberPosUpdate++;
-                    Plugin.Log.Debug("x" + rSaberPos.x + " y" + rSaberPos.y + " z" + rSaberPos.z); // log saber position
+                    //Plugin.Log.Debug("x" + rSaberPos.x + " y" + rSaberPos.y + " z" + rSaberPos.z); // log saber position
 
                     //tracking loss
                     if (rSaberPos.x == prevRSaberPos.x && rSaberPos.y == prevRSaberPos.y && rSaberPos.z == prevRSaberPos.z)
@@ -190,7 +189,7 @@ namespace AntiLagMod
                 }
                 catch (Exception exception)
                 {
-                    CriticalErrorHandler(true, 165, exception);
+                    CriticalErrorHandler(true, 188, exception);
                 }
             }
             if (firstOrLast == "last")
@@ -198,11 +197,11 @@ namespace AntiLagMod
                 try
                 {
                     prevRSaberPos = rSaber.handlePos;
-                    prevRSaberPos = lSaber.handlePos;
+                    prevLSaberPos = lSaber.handlePos;
                 }
                 catch (Exception exception)
                 {
-                    CriticalErrorHandler(true, 177, exception);
+                    CriticalErrorHandler(true, 200, exception);
                 }
             }
 
@@ -275,7 +274,12 @@ namespace AntiLagMod
             PauseController = Resources.FindObjectsOfTypeAll<PauseController>().FirstOrDefault();
             if (PauseController == null)
             {
-                CriticalErrorHandler(true, 219);
+                CriticalErrorHandler(true, 274);
+            }
+            FindSabers();
+            if (rSaber == null || lSaber == null)
+            {
+                CriticalErrorHandler(true, 218);
             }
 
         }
