@@ -23,7 +23,7 @@ namespace AntiLagMod
         #region global variables
         public static AntiLagModController Instance { get; private set; }
 
-        private bool criticalError;
+        public bool criticalError;
 
         private bool modEnabled;
         private float frameThreshold;
@@ -57,9 +57,9 @@ namespace AntiLagMod
 
         public PlayerHeightDetector PlayerHeightDetector;
 
-
-
         public static PauseController PauseController;
+
+        
         #endregion
 
         #region Monobehaviour Messages
@@ -88,8 +88,10 @@ namespace AntiLagMod
         {
             CheckFrameRate();
             CheckEvents();
+
             if (isLevel && modEnabled)
             {
+
                 #region frame drop detection
                 if (frameDropDetection)
                 {
@@ -116,9 +118,11 @@ namespace AntiLagMod
 
                 #region tracking issues detection
 
+                CheckSaberPos();
+
                 if (driftDetection)
                 {
-
+                    Plugin.Log.Debug("x" + rSaberPos.x + " y" + rSaberPos.y + " z" + rSaberPos.z); // log saber position
                 }
 
                 #endregion
@@ -144,6 +148,21 @@ namespace AntiLagMod
         }
         #endregion
 
+        private void CheckSaberPos()
+        {
+            //int saberTypeArrayLength = Resources.FindObjectsOfTypeAll<Saber>().Length;
+            rSaber = Resources.FindObjectsOfTypeAll<Saber>().ElementAt(0); // i hope this is right
+            lSaber = Resources.FindObjectsOfTypeAll<Saber>().ElementAt(1);
+            //Plugin.Log.Debug("There are " + saberTypeArrayLength + " instances of type Saber");
+            try
+            {
+                rSaberPos = rSaber.handlePos;
+                lSaberPos = lSaber.handlePos;
+            } catch (Exception exception)
+            {
+                CriticalErrorHandler(true, 160, exception);
+            }
+        }
         public static void Refresh() // refresh the class variables to equal the property variables
         {
             // I farted really hard when I wrote this
@@ -199,9 +218,7 @@ namespace AntiLagMod
             PauseController = Resources.FindObjectsOfTypeAll<PauseController>().FirstOrDefault();
             if (PauseController == null)
             {
-                Plugin.Log.Error("Could not find PauseController object... Disabling mod...");
-                modEnabled = false;
-                criticalError = true;
+                CriticalErrorHandler(true, 219);
             }
 
         }
@@ -230,6 +247,49 @@ namespace AntiLagMod
         private void OnLevelResume() // level resumed delegate
         {
             StartCoroutine(WaitThenReActivate());
+        }
+        
+        private  void CriticalErrorHandler(bool error, int lineNumber = 0, Exception exception = null) // i overdid this but idrc
+        {
+            int _case = 0;
+            if (lineNumber == 0)
+            {
+                _case = 1;
+            } 
+            if(exception == null)
+            {
+                _case = 2;
+            }
+            if (exception != null && lineNumber != 0)
+            {
+                _case = 3;
+            }
+            if (error)
+            {
+                switch (_case)
+                {
+                    default:
+                        Plugin.Log.Warn("A critical error has been encountered, disabling mod...");
+                        break;
+                    case 0:
+                        Plugin.Log.Warn("A critical error has been encountered, disabling mod...");
+                        break;
+                    case 1:
+                        Plugin.Log.Warn("A critical error has been encountered, disabling mod...");
+                        Plugin.Log.Error(exception);
+                        break;
+                    case 2:
+                        Plugin.Log.Warn("A critical error has been encountered around line " + lineNumber + ", disabling mod.");
+                        break;
+                    case 3:
+                        Plugin.Log.Warn("A critical error has been encountered around line " + lineNumber + ", disabling mod.");
+                        Plugin.Log.Error(exception);
+                        break;
+
+                }
+                criticalError = true;
+                modEnabled = false;
+            }
         }
     }
 }
