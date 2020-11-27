@@ -189,7 +189,7 @@ namespace AntiLagMod
                 }
                 catch (Exception exception)
                 {
-                    //CriticalErrorHandler(true, 188, exception);
+                    CriticalErrorHandler(true, 188, exception);
                 }
             }
             if (firstOrLast == "last")
@@ -201,7 +201,7 @@ namespace AntiLagMod
                 }
                 catch (Exception exception)
                 {
-                    //CriticalErrorHandler(true, 200, exception);
+                    CriticalErrorHandler(true, 200, exception);
                 }
             }
 
@@ -274,12 +274,12 @@ namespace AntiLagMod
             PauseController = Resources.FindObjectsOfTypeAll<PauseController>().FirstOrDefault();
             if (PauseController == null)
             {
-                //CriticalErrorHandler(true, 274);
+                CriticalErrorHandler(true, 274);
             }
             FindSabers();
             if (rSaber == null || lSaber == null)
             {
-                //CriticalErrorHandler(true, 218);
+                CriticalErrorHandler(true, 218);
             }
 
         }
