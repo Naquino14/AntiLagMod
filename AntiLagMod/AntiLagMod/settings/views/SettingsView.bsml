@@ -17,7 +17,7 @@
         <slider-setting text="Frame Drop Threshold" apply-on-change="true" value="frame-drop-threshold" min="5" max="~max-framerate" increment="1" hover-hint="Pause the game after game framerate drops below this number"></slider-setting>
       </horizontal>
       <horizontal>
-        <slider-setting text="Detection Delay" apply-on-change="true" value="wait-then-active" min="0" max="10" increment="0.5" hover-hint="Start waiting for lag spikes after this many seconds"></slider-setting>
+        <slider-setting text="Detection Delay" apply-on-change="true" value="wait-then-active" min="1" max="10" increment="0.5" hover-hint="Start waiting for lag spikes after this many seconds"></slider-setting>
       </horizontal>
       <horizontal horizontal-fit="PreferredSize">
         <text text="Drift Detection"></text>

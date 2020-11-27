@@ -50,8 +50,8 @@ namespace AntiLagMod.settings.views
         [UIValue("drift-detection-enabled")]
         public bool driftDetection
         {
-            get => Configuration.DriftDetectionEnabled;
-            set => Configuration.DriftDetectionEnabled = value;
+            get => Configuration.TrackingErrorDetectionEnabled;
+            set => Configuration.TrackingErrorDetectionEnabled = value;
         }
 
         [UIAction("save")]
@@ -93,7 +93,6 @@ namespace AntiLagMod.settings.views
 
         private void SaveConfig() // prob doesnt actually do anything useful but its here anyway
         {
-            driftDetection = false;
             Plugin.SaveConfig();
             AntiLagModController.Refresh();
         }

@@ -14,7 +14,7 @@ namespace AntiLagMod.settings.utilities
         public float frameThreshold = 5f;
         public bool frameDropDetectionEnabled;
         public float waitThenActive = 1f;
-        public bool driftDetectionEnabled = false;
+        public bool trackingErrorDetectionEnabled = false;
         public float driftThreshold = 10f;
 
     }

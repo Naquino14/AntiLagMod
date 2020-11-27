@@ -42,6 +42,23 @@ namespace AntiLagMod
         private bool activePause = false;
         private bool waitThenActiveFireOnce;
 
+        // frame drop stuff here ^^^
+        // tracking issues here vvv
+
+        private bool driftDetection;
+        private float driftThreshold;
+
+        public Saber rSaber;
+        public Saber lSaber;
+        private Vector3 rSaberPos;
+        private Vector3 lSaberPos;
+        private Vector3 prevRSaberPos;
+        private Vector3 prevLSaberPos;
+
+        public PlayerHeightDetector PlayerHeightDetector;
+
+
+
         public static PauseController PauseController;
         #endregion
 
@@ -71,26 +88,40 @@ namespace AntiLagMod
         {
             CheckFrameRate();
             CheckEvents();
-            if (isLevel && modEnabled && frameDropDetection)
+            if (isLevel && modEnabled)
             {
+                #region frame drop detection
+                if (frameDropDetection)
+                {
+                    //Plugin.Log.Debug("FR: " + frameRate);
+                    if (waitThenActiveFireOnce)
+                    {
+                        Plugin.Log.Debug("Lag Detected...");
+                        StartCoroutine(WaitThenActive());
+                        waitThenActiveFireOnce = false;
+                    }
+                    if (activePause && (frameRate < frameThreshold))
+                    {
+                        activePause = false;
+                        PauseController.Pause();
+                        Plugin.Log.Warn("FPS DROP DETECTED");
+                        Plugin.Log.Debug("FPS 1 frame before drop: " + frameRate);
+                    }
+                    if (!activePause)
+                    {
+                        PauseController.didResumeEvent += OnLevelResume;
+                    }
+                }
+                #endregion
 
-                Plugin.Log.Debug("FR: " + frameRate);
-                if (waitThenActiveFireOnce)
+                #region tracking issues detection
+
+                if (driftDetection)
                 {
-                    StartCoroutine(WaitThenActive());
-                    waitThenActiveFireOnce = false;
+
                 }
-                if (activePause && (frameRate < frameThreshold))
-                {
-                    activePause = false;
-                    //PauseController.Pause(); // disable for debug
-                    //Plugin.Log.Warn("FPS DROP DETECTED");
-                }
-                if (!activePause)
-                {
-                    PauseController.didResumeEvent += OnLevelResume;
-                }
-                    
+
+                #endregion
             }
         }
         private void FixedUpdate()
@@ -120,6 +151,9 @@ namespace AntiLagMod
             Instance.frameDropDetection = Configuration.FrameDropDetectionEnabled;
             Instance.frameThreshold = Configuration.FrameThreshold;
             Instance.waitThenActiveTime = Configuration.WaitThenActive;
+
+            Instance.driftDetection = Configuration.TrackingErrorDetectionEnabled;
+            Instance.driftThreshold = Configuration.DriftThreshold;
         }
         private void CheckFrameRate()
         {
