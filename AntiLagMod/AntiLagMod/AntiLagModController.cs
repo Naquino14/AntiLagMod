@@ -45,6 +45,11 @@ namespace AntiLagMod
         // frame drop stuff here ^^^
         // tracking issues here vvv
 
+        private bool trackingActiveFireOnce;
+
+        private bool driftDetected;
+        private bool trackingLossDetected;
+
         private bool driftDetection;
         private float driftThreshold;
 
@@ -54,6 +59,7 @@ namespace AntiLagMod
         private Vector3 lSaberPos;
         private Vector3 prevRSaberPos;
         private Vector3 prevLSaberPos;
+        private int framesSinceLastSaberPosUpdate = 0;
 
         public PlayerHeightDetector PlayerHeightDetector;
 
@@ -83,6 +89,8 @@ namespace AntiLagMod
             if (!criticalError)
                 Refresh();
             waitThenActiveFireOnce = true;
+            trackingActiveFireOnce = true;
+            FindSabers();
         }
         private void Update()
         {
@@ -91,38 +99,61 @@ namespace AntiLagMod
 
             if (isLevel && modEnabled)
             {
+                if (waitThenActiveFireOnce)
+                {
+                    StartCoroutine(WaitThenActive());
+                    waitThenActiveFireOnce = false;
+                }
+                if (!activePause)
+                {
+                    PauseController.didResumeEvent += OnLevelResume;
+                }
 
                 #region frame drop detection
                 if (frameDropDetection)
                 {
                     //Plugin.Log.Debug("FR: " + frameRate);
-                    if (waitThenActiveFireOnce)
-                    {
-                        Plugin.Log.Debug("Lag Detected...");
-                        StartCoroutine(WaitThenActive());
-                        waitThenActiveFireOnce = false;
-                    }
                     if (activePause && (frameRate < frameThreshold))
                     {
-                        activePause = false;
-                        PauseController.Pause();
+                        Pause();
                         Plugin.Log.Warn("FPS DROP DETECTED");
                         Plugin.Log.Debug("FPS 1 frame before drop: " + frameRate);
-                    }
-                    if (!activePause)
-                    {
-                        PauseController.didResumeEvent += OnLevelResume;
                     }
                 }
                 #endregion
 
                 #region tracking issues detection
 
-                CheckSaberPos();
-
                 if (driftDetection)
                 {
+                    string whichController = "(error getting which controller)";
+
+                    CheckSaberPos("last");
+                    if(framesSinceLastSaberPosUpdate == 1)
+                    {
+                        framesSinceLastSaberPosUpdate = 0;
+                        CheckSaberPos("first");
+                    }
+                    framesSinceLastSaberPosUpdate++;
                     Plugin.Log.Debug("x" + rSaberPos.x + " y" + rSaberPos.y + " z" + rSaberPos.z); // log saber position
+
+                    //tracking loss
+                    if (rSaberPos.x == prevRSaberPos.x && rSaberPos.y == prevRSaberPos.y && rSaberPos.z == prevRSaberPos.z)
+                    {
+                        trackingLossDetected = true;
+                        whichController = "left";
+                    }
+                    if (lSaberPos.x == prevLSaberPos.x && lSaberPos.y == prevLSaberPos.y && lSaberPos.z == prevLSaberPos.z)
+                    {
+                        trackingLossDetected = true;
+                        whichController = "right";
+                    }
+                    if (activePause && trackingLossDetected)
+                    {
+                        Plugin.Log.Debug("Tracking issues detected with " + whichController + " controller.");
+                        Pause();
+                    }
+
                 }
 
                 #endregion
@@ -148,20 +179,46 @@ namespace AntiLagMod
         }
         #endregion
 
-        private void CheckSaberPos()
+        private void CheckSaberPos(string firstOrLast)
+        {
+            if (firstOrLast == "first")
+            {
+                try
+                {
+                    rSaberPos = rSaber.handlePos;
+                    lSaberPos = lSaber.handlePos;
+                }
+                catch (Exception exception)
+                {
+                    CriticalErrorHandler(true, 165, exception);
+                }
+            }
+            if (firstOrLast == "last")
+            {
+                try
+                {
+                    prevRSaberPos = rSaber.handlePos;
+                    prevRSaberPos = lSaber.handlePos;
+                }
+                catch (Exception exception)
+                {
+                    CriticalErrorHandler(true, 177, exception);
+                }
+            }
+
+
+        }
+        private void Pause()
+        {
+            activePause = false;
+            PauseController.Pause();
+        }
+        private void FindSabers()
         {
             //int saberTypeArrayLength = Resources.FindObjectsOfTypeAll<Saber>().Length;
             rSaber = Resources.FindObjectsOfTypeAll<Saber>().ElementAt(0); // i hope this is right
             lSaber = Resources.FindObjectsOfTypeAll<Saber>().ElementAt(1);
             //Plugin.Log.Debug("There are " + saberTypeArrayLength + " instances of type Saber");
-            try
-            {
-                rSaberPos = rSaber.handlePos;
-                lSaberPos = lSaber.handlePos;
-            } catch (Exception exception)
-            {
-                CriticalErrorHandler(true, 160, exception);
-            }
         }
         public static void Refresh() // refresh the class variables to equal the property variables
         {
