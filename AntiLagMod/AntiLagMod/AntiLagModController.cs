@@ -10,6 +10,7 @@ using AntiLagMod.settings.views;
 using AntiLagMod.settings;
 using UnityEngine.Events;
 using BS_Utils.Utilities;
+using UnityEngine;
 
 namespace AntiLagMod
     
@@ -65,7 +66,11 @@ namespace AntiLagMod
 
         public static PauseController PauseController;
 
+        // tracking issues here ^^^
+        // asset bundle stuff here vvv
+
         
+
         #endregion
 
         #region Monobehaviour Messages
@@ -177,7 +182,10 @@ namespace AntiLagMod
 
         }
         #endregion
+        public void LoadAssetBundles(string bundleURL)
+        {
 
+        }
         private void CheckSaberPos(string firstOrLast)
         {
             if (firstOrLast == "first")
