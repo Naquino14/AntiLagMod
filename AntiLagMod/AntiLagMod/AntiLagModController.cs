@@ -32,7 +32,7 @@ namespace AntiLagMod
         private float waitThenActiveTime;
 
         private bool isLevel;
-        private bool test = true;
+        private bool subToResumeFireOnce = true;
 
         private int frameRate;
         private int frameCounter = 0;
@@ -43,10 +43,6 @@ namespace AntiLagMod
         private bool activePause = false;
         private bool waitThenActiveFireOnce;
 
-        public bool boundingBoxEnabled;
-
-        private bool bbFireOnce = false;
-
         // frame drop stuff here ^^^
         // tracking issues here vvv
 
@@ -55,7 +51,7 @@ namespace AntiLagMod
         private bool driftDetected;
         private bool trackingLossDetected;
 
-        private bool driftDetection;
+        private bool trackingIssueDetection;
         private float driftThreshold;
 
         public Saber rSaber;
@@ -82,6 +78,10 @@ namespace AntiLagMod
         private GameObject activeCubeHolder;
         private bool activeCubeActive = false; // bruh\
 
+        public bool boundingBoxEnabled;
+
+        private bool bbFireOnce = true;
+
         #endregion
 
         #region Monobehaviour Messages
@@ -107,13 +107,12 @@ namespace AntiLagMod
             waitThenActiveFireOnce = true;
             trackingActiveFireOnce = true;
             CheckEvents();
-            Plugin.Log.Debug("fired");
             LoadAssetBundles();
         }
         private void Update()
         {
             CheckFrameRate();
-            //Plugin.Log.Debug("" + bbFireOnce);
+            //Plugin.Log.Debug("" + activePause);
             if (isLevel && modEnabled)
             {
                 if (waitThenActiveFireOnce)
@@ -121,9 +120,10 @@ namespace AntiLagMod
                     StartCoroutine(WaitThenActive());
                     waitThenActiveFireOnce = false;
                 }
-                if (!activePause)
+                if (!activePause && subToResumeFireOnce)
                 {
                     PauseController.didResumeEvent += OnLevelResume;
+                    subToResumeFireOnce = false;
                 }
 
                 #region frame drop detection
@@ -141,8 +141,10 @@ namespace AntiLagMod
 
                 #region tracking issues detection
 
-                if (driftDetection)
+                if (trackingIssueDetection && activePause)
                 {
+                    
+                    // check saber positions
                     string whichController = "(error getting which controller)";
 
                     CheckSaberPos("last");
@@ -153,6 +155,8 @@ namespace AntiLagMod
                     }
                     framesSinceLastSaberPosUpdate++;
                     //Plugin.Log.Debug("x" + rSaberPos.x + " y" + rSaberPos.y + " z" + rSaberPos.z); // log saber position
+
+                    #region tracking loss detection
 
                     //tracking loss
                     if (rSaberPos.x == prevRSaberPos.x && rSaberPos.y == prevRSaberPos.y && rSaberPos.z == prevRSaberPos.z)
@@ -171,25 +175,24 @@ namespace AntiLagMod
                         Pause();
                     }
 
+                    #endregion
+
+                    #region drift detection
+
+                    // nothing here but us chickens
+
+                    #endregion
                 }
 
                 #endregion
-
-
-                #region drift detection
-
-                // nothing here but us chickens :trollface:
-
-                #endregion
-                
             }
             #region drift detection settings
 
             if (boundingBoxEnabled)
             {
-                if (!bbFireOnce)
+                if (bbFireOnce)
                 {
-                    bbFireOnce = true;
+                    bbFireOnce = false;
                     activeCubeHolder = Instantiate(cubeHolder);
                     activeCubeActive = true;
                 }
@@ -254,7 +257,7 @@ namespace AntiLagMod
                 }
                 catch (Exception exception)
                 {
-                    CriticalErrorHandler(true, 188, exception);
+                    CriticalErrorHandler(true, 252, exception);
                 }
             }
             if (firstOrLast == "last")
@@ -266,7 +269,7 @@ namespace AntiLagMod
                 }
                 catch (Exception exception)
                 {
-                    CriticalErrorHandler(true, 200, exception);
+                    CriticalErrorHandler(true, 264, exception);
                 }
             }
 
@@ -279,6 +282,7 @@ namespace AntiLagMod
         }
         private void FindSabers()
         {
+            Plugin.Log.Debug("Looking for sabers...");
             //int saberTypeArrayLength = Resources.FindObjectsOfTypeAll<Saber>().Length;
             rSaber = Resources.FindObjectsOfTypeAll<Saber>().ElementAt(0); // i hope this is right
             lSaber = Resources.FindObjectsOfTypeAll<Saber>().ElementAt(1);
@@ -292,7 +296,7 @@ namespace AntiLagMod
             Instance.frameThreshold = Configuration.FrameThreshold;
             Instance.waitThenActiveTime = Configuration.WaitThenActive;
 
-            Instance.driftDetection = Configuration.TrackingErrorDetectionEnabled;
+            Instance.trackingIssueDetection = Configuration.TrackingErrorDetectionEnabled;
             Instance.driftThreshold = Configuration.DriftThreshold;
         }
         private void CheckFrameRate()
@@ -324,12 +328,13 @@ namespace AntiLagMod
             activePause = true;
         }
 
-        private void CheckEvents() // simply checks the events
+        private void CheckEvents() // simply subscribes to the the events
         {
             BSEvents.gameSceneLoaded += OnLevelStart; 
             BSEvents.levelFailed += OnLevelFail;
             BSEvents.levelCleared += OnLevelClear;
             BSEvents.levelQuit += OnLevelQuit;
+            BSEvents.levelRestarted += OnLevelRestart;
         }
         private void OnLevelStart() // level start delegate
         {
@@ -339,12 +344,12 @@ namespace AntiLagMod
             PauseController = Resources.FindObjectsOfTypeAll<PauseController>().FirstOrDefault();
             if (PauseController == null)
             {
-                CriticalErrorHandler(true, 274);
+                CriticalErrorHandler(true, 339);
             }
             FindSabers();
             if (rSaber == null || lSaber == null)
             {
-                CriticalErrorHandler(true, 218);
+                CriticalErrorHandler(true, 345);
             }
 
         }
@@ -368,6 +373,13 @@ namespace AntiLagMod
             //Plugin.Log.Debug("Level Quit");
             isLevel = false;
             activePause = false;
+            subToResumeFireOnce = true;
+        }
+
+        private void OnLevelRestart(StandardLevelScenesTransitionSetupDataSO unused, LevelCompletionResults unusedResult)
+        {
+            //Plugin.Log.Debug("Level Restarted");
+            OnLevelStart();
         }
 
         private void OnLevelResume() // level resumed delegate
@@ -420,7 +432,7 @@ namespace AntiLagMod
         public void FlowCoordinatorBackPressed()
         {
             boundingBoxEnabled = false;
-            bbFireOnce = false;
+            bbFireOnce = true;
             if (activeCubeActive)
                 Destroy(activeCubeHolder);
         }
