@@ -43,6 +43,10 @@ namespace AntiLagMod
         private bool activePause = false;
         private bool waitThenActiveFireOnce;
 
+        public bool boundingBoxEnabled;
+
+        private bool bbFireOnce = false;
+
         // frame drop stuff here ^^^
         // tracking issues here vvv
 
@@ -75,6 +79,9 @@ namespace AntiLagMod
         private Shader cubeShader;
         //private string assetBundlePath;
 
+        private GameObject activeCubeHolder;
+        private bool activeCubeActive = false; // bruh\
+
         #endregion
 
         #region Monobehaviour Messages
@@ -100,12 +107,13 @@ namespace AntiLagMod
             waitThenActiveFireOnce = true;
             trackingActiveFireOnce = true;
             CheckEvents();
+            Plugin.Log.Debug("fired");
             LoadAssetBundles();
         }
         private void Update()
         {
             CheckFrameRate();
-
+            //Plugin.Log.Debug("" + bbFireOnce);
             if (isLevel && modEnabled)
             {
                 if (waitThenActiveFireOnce)
@@ -166,7 +174,32 @@ namespace AntiLagMod
                 }
 
                 #endregion
+
+
+                #region drift detection
+
+                // nothing here but us chickens :trollface:
+
+                #endregion
+                
             }
+            #region drift detection settings
+
+            if (boundingBoxEnabled)
+            {
+                if (!bbFireOnce)
+                {
+                    bbFireOnce = true;
+                    activeCubeHolder = Instantiate(cubeHolder);
+                    activeCubeActive = true;
+                }
+                if (activeCubeActive)
+                {
+                    activeCubeHolder.transform.localScale = new Vector3(driftThreshold, driftThreshold, driftThreshold);
+                }
+            }
+
+            #endregion
         }
         private void FixedUpdate()
         {
@@ -197,9 +230,9 @@ namespace AntiLagMod
 
                 Plugin.Log.Debug("Attempting to load assets...");
                 dasCuubenAssetBundle = _assetBundle;
-                cubeHolder = _assetBundle.LoadAsset<GameObject>("almmod/CubeContainer");
-                cubeMaterial = _assetBundle.LoadAsset<Material>("almmod/dascuuben");
-                cubeShader = _assetBundle.LoadAsset<Shader>("almmod/sh_custom_unlit");
+                cubeHolder = _assetBundle.LoadAsset<GameObject>("Assets/ALM/CubeContainer.prefab");
+                cubeMaterial = _assetBundle.LoadAsset<Material>("Assets/ALM/dascuuben.mat");
+                cubeShader = _assetBundle.LoadAsset<Shader>("Assets/ALM/sh_custom_unlit.shader");
                 Plugin.Log.Debug("Success! Loaded all assets.");
 
             } catch(Exception exception)
@@ -383,6 +416,18 @@ namespace AntiLagMod
                 criticalError = true;
                 modEnabled = false;
             }
+        }
+        public void FlowCoordinatorBackPressed()
+        {
+            boundingBoxEnabled = false;
+            bbFireOnce = false;
+            if (activeCubeActive)
+                Destroy(activeCubeHolder);
+        }
+
+        public static void EnableBB()
+        {
+            Instance.boundingBoxEnabled = true;
         }
     }
 }

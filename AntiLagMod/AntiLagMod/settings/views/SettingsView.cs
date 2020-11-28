@@ -16,6 +16,7 @@ namespace AntiLagMod.settings.views
     public class SettingsView : BSMLAutomaticViewController
     {
 
+
         //:flooshed:
         [UIValue("mod-enabled")]
         public bool modEnabled
@@ -82,6 +83,12 @@ namespace AntiLagMod.settings.views
             set => Configuration.DriftThreshold = value;
         }
 
+        [UIAction("show-bb")]
+        private void ShowBBPressed()
+        {
+            AntiLagModController.EnableBB();
+            
+        }
 
         [UIAction("initiate-trolling")]
         private void ButtonPress() // ima leave this here as an easter egg 

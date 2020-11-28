@@ -12,12 +12,17 @@ namespace AntiLagMod
     class ALMFlowCoordinator : FlowCoordinator
     {
         private SettingsView settingsView;
+        private AntiLagModController antiLagModController;
 
         void Awake()
         {
             if (!settingsView)
             {
                 settingsView = BeatSaberUI.CreateViewController<SettingsView>();
+            }
+            if (!antiLagModController)
+            {
+                antiLagModController = FindObjectOfType<AntiLagModController>();
             }
         }
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
@@ -29,7 +34,8 @@ namespace AntiLagMod
                 {
                     SetTitle("Anti Lag Mod");
                     showBackButton = true;
-                    ProvideInitialViewControllers(settingsView); 
+                    ProvideInitialViewControllers(settingsView);
+                    
                     
                 }
             } catch (Exception exception)
@@ -38,10 +44,12 @@ namespace AntiLagMod
             }
         }
 
+
         protected override void BackButtonWasPressed(ViewController topViewController)
         {
             //base.BackButtonWasPressed(topViewController);
             BeatSaberUI.MainFlowCoordinator.DismissFlowCoordinator(this);
+            antiLagModController.FlowCoordinatorBackPressed();
         }
 
 
