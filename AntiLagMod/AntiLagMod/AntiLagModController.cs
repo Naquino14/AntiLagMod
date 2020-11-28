@@ -10,7 +10,8 @@ using AntiLagMod.settings.views;
 using AntiLagMod.settings;
 using UnityEngine.Events;
 using BS_Utils.Utilities;
-using UnityEngine;
+using System.Reflection;
+using AntiLagMod.StreamingAssets;
 
 namespace AntiLagMod
     
@@ -69,7 +70,11 @@ namespace AntiLagMod
         // tracking issues here ^^^
         // asset bundle stuff here vvv
 
-        
+        AssetBundle dasCuubenAssetBundle;
+        private GameObject cubeHolder;
+        private Material cubeMaterial;
+        private Shader cubeShader;
+        //private string assetBundlePath;
 
         #endregion
 
@@ -96,6 +101,7 @@ namespace AntiLagMod
             waitThenActiveFireOnce = true;
             trackingActiveFireOnce = true;
             CheckEvents();
+            LoadAssetBundles();
         }
         private void Update()
         {
@@ -182,9 +188,23 @@ namespace AntiLagMod
 
         }
         #endregion
-        public void LoadAssetBundles(string bundleURL)
+        public void LoadAssetBundles() // dies of bruh
         {
+            try
+            {
+                var _stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("AntiLagMod.StreamingAssets.almmod");
+                var _assetBundle = AssetBundle.LoadFromStream(_stream);
 
+                //dasCuubenAssetBundle = _assetBundle;
+                //cubeHolder = _assetBundle.LoadAsset<GameObject>("uhhhhh");
+
+            } catch(Exception exception)
+            {
+                CriticalErrorHandler(true, 196, exception);
+            } // gabe shut the fi*ck up that wasnt funny (bad wrord))
+              // im going to come to your house andd eat all your food
+
+            
         }
         private void CheckSaberPos(string firstOrLast)
         {
