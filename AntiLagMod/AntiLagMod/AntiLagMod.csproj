@@ -133,7 +133,6 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="AntiLagModController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StreamingAssets\useless.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />

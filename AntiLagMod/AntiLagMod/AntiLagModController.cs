@@ -11,7 +11,6 @@ using AntiLagMod.settings;
 using UnityEngine.Events;
 using BS_Utils.Utilities;
 using System.Reflection;
-using AntiLagMod.StreamingAssets;
 
 namespace AntiLagMod
     
@@ -192,15 +191,20 @@ namespace AntiLagMod
         {
             try
             {
+                Plugin.Log.Debug("Locating asset bundle and assigning it to _stream...");
                 var _stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("AntiLagMod.StreamingAssets.almmod");
                 var _assetBundle = AssetBundle.LoadFromStream(_stream);
 
-                //dasCuubenAssetBundle = _assetBundle;
-                //cubeHolder = _assetBundle.LoadAsset<GameObject>("uhhhhh");
+                Plugin.Log.Debug("Attempting to load assets...");
+                dasCuubenAssetBundle = _assetBundle;
+                cubeHolder = _assetBundle.LoadAsset<GameObject>("almmod/CubeContainer");
+                cubeMaterial = _assetBundle.LoadAsset<Material>("almmod/dascuuben");
+                cubeShader = _assetBundle.LoadAsset<Shader>("almmod/sh_custom_unlit");
+                Plugin.Log.Debug("Success! Loaded all assets.");
 
             } catch(Exception exception)
             {
-                CriticalErrorHandler(true, 196, exception);
+                CriticalErrorHandler(true, 201, exception);
             } // gabe shut the fi*ck up that wasnt funny (bad wrord))
               // im going to come to your house andd eat all your food
 
