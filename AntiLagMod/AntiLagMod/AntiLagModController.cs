@@ -11,6 +11,7 @@ using AntiLagMod.settings;
 using UnityEngine.Events;
 using BS_Utils.Utilities;
 using System.Reflection;
+using AntiLagMod.StreamingAssets;
 
 namespace AntiLagMod
     
@@ -23,6 +24,8 @@ namespace AntiLagMod
     {
         #region global variables
         public static AntiLagModController Instance { get; private set; }
+
+        private BBCollider bbColliderScript;
 
         public bool criticalError;
 
@@ -60,6 +63,8 @@ namespace AntiLagMod
         private Vector3 lSaberPos;
         private Vector3 prevRSaberPos;
         private Vector3 prevLSaberPos;
+        private Transform rSaberTransform;
+        private Transform lSaberTransform;
         private int framesSinceLastSaberPosUpdate = 0;
 
         public PlayerHeightDetector PlayerHeightDetector;
@@ -73,6 +78,7 @@ namespace AntiLagMod
         private GameObject cubeHolder;
         private Material cubeMaterial;
         private Shader cubeShader;
+        private BoxCollider cubeCollider;
         //private string assetBundlePath;
 
         private GameObject activeCubeHolder;
@@ -81,6 +87,13 @@ namespace AntiLagMod
         public bool boundingBoxEnabled;
 
         private bool bbFireOnce = true;
+
+        private GameObject colliderCubeActive;
+        private bool colliderBBFireOnce = true;
+        private bool colliderBBactive;
+
+        Vector3 bbScale;
+        private float bbScaleDivider = 20;
 
         #endregion
 
@@ -112,7 +125,9 @@ namespace AntiLagMod
         private void Update()
         {
             CheckFrameRate();
-            //Plugin.Log.Debug("" + activePause);
+            //Plugin.Log.Debug("" + modEnabled);
+            bbScale = new Vector3(driftThreshold / bbScaleDivider, driftThreshold / bbScaleDivider, driftThreshold / bbScaleDivider);
+            //Plugin.Log.Debug("" + bbScaleDivider);
             if (isLevel && modEnabled)
             {
                 if (waitThenActiveFireOnce)
@@ -181,6 +196,12 @@ namespace AntiLagMod
 
                     // nothing here but us chickens
 
+                    if (colliderBBFireOnce)
+                    {
+                        colliderBBFireOnce = false;
+                        CreateBBCollider();
+                    }
+
                     #endregion
                 }
 
@@ -192,29 +213,24 @@ namespace AntiLagMod
             {
                 if (bbFireOnce)
                 {
+                    Plugin.Log.Debug("Attempting to make menu bb...");
                     bbFireOnce = false;
                     activeCubeHolder = Instantiate(cubeHolder);
                     activeCubeActive = true;
                 }
                 if (activeCubeActive)
                 {
-                    activeCubeHolder.transform.localScale = new Vector3(driftThreshold, driftThreshold, driftThreshold);
+                    activeCubeHolder.transform.localScale = bbScale;
                 }
             }
 
             #endregion
         }
-        private void FixedUpdate()
-        {
-            if (isLevel && modEnabled)
-            {
-                //
-            }
-        }
         private void OnEnable()
         {
             isLevel = false;
         }
+
         private void OnDestroy()
         {
             Plugin.Log?.Debug($"{name}: OnDestroy()");
@@ -222,6 +238,7 @@ namespace AntiLagMod
                 Instance = null; // This MonoBehaviour is being destroyed, so set the static instance property to null.
 
         }
+
         #endregion
         public void LoadAssetBundles() // dies of bruh
         {
@@ -236,16 +253,19 @@ namespace AntiLagMod
                 cubeHolder = _assetBundle.LoadAsset<GameObject>("Assets/ALM/CubeContainer.prefab");
                 cubeMaterial = _assetBundle.LoadAsset<Material>("Assets/ALM/dascuuben.mat");
                 cubeShader = _assetBundle.LoadAsset<Shader>("Assets/ALM/sh_custom_unlit.shader");
+                cubeCollider = cubeHolder.GetComponent<BoxCollider>();
+
                 Plugin.Log.Debug("Success! Loaded all assets.");
 
             } catch(Exception exception)
             {
-                CriticalErrorHandler(true, 201, exception);
+                CriticalErrorHandler(true, 239, exception);
             } // gabe shut the fi*ck up that wasnt funny (bad wrord))
               // im going to come to your house andd eat all your food
 
             
         }
+
         private void CheckSaberPos(string firstOrLast)
         {
             if (firstOrLast == "first")
@@ -275,6 +295,7 @@ namespace AntiLagMod
 
 
         }
+
         private void Pause()
         {
             activePause = false;
@@ -288,6 +309,7 @@ namespace AntiLagMod
             lSaber = Resources.FindObjectsOfTypeAll<Saber>().ElementAt(1);
             //Plugin.Log.Debug("There are " + saberTypeArrayLength + " instances of type Saber");
         }
+
         public static void Refresh() // refresh the class variables to equal the property variables
         {
             // I farted really hard when I wrote this
@@ -299,6 +321,7 @@ namespace AntiLagMod
             Instance.trackingIssueDetection = Configuration.TrackingErrorDetectionEnabled;
             Instance.driftThreshold = Configuration.DriftThreshold;
         }
+
         private void CheckFrameRate()
         {
             if (frameCounter < refreshRate)
@@ -336,6 +359,7 @@ namespace AntiLagMod
             BSEvents.levelQuit += OnLevelQuit;
             BSEvents.levelRestarted += OnLevelRestart;
         }
+
         private void OnLevelStart() // level start delegate
         {
             //Plugin.Log.Debug("Level Started");
@@ -351,6 +375,7 @@ namespace AntiLagMod
             {
                 CriticalErrorHandler(true, 345);
             }
+            
 
         }
 
@@ -359,6 +384,7 @@ namespace AntiLagMod
             //Plugin.Log.Debug("LevelFailed");
             isLevel = false;
             activePause = false;
+            DestroyBBCollider();
         }
 
         private void OnLevelClear(StandardLevelScenesTransitionSetupDataSO unused, LevelCompletionResults unusedResult) // level cleared delegate
@@ -366,6 +392,7 @@ namespace AntiLagMod
             //Plugin.Log.Debug("Level Ended");
             isLevel = false;
             activePause = false;
+            DestroyBBCollider();
         }
 
         private void OnLevelQuit(StandardLevelScenesTransitionSetupDataSO unused, LevelCompletionResults unusedResult) // level quit delegate
@@ -374,6 +401,7 @@ namespace AntiLagMod
             isLevel = false;
             activePause = false;
             subToResumeFireOnce = true;
+            DestroyBBCollider();
         }
 
         private void OnLevelRestart(StandardLevelScenesTransitionSetupDataSO unused, LevelCompletionResults unusedResult)
@@ -440,6 +468,41 @@ namespace AntiLagMod
         public static void EnableBB()
         {
             Instance.boundingBoxEnabled = true;
+        }
+
+        private void CreateBBCollider()
+        {
+            Plugin.Log.Debug("Attempting to create scene bb...");
+            colliderCubeActive = Instantiate(cubeHolder);
+            colliderCubeActive.transform.localScale = bbScale;
+            colliderBBactive = true;
+            GameObject dasCuuben = colliderCubeActive.GetComponentInChildren<GameObject>();
+            
+            try
+            {
+                //dasCuuben.SetActive(false);
+            } catch (Exception exception)
+            {
+                Plugin.Log.Warn("Gameobject dasCuuben was not found...");
+                CriticalErrorHandler(true, 479, exception);
+            }
+        }
+
+        private void DestroyBBCollider()
+        {
+            if (colliderBBactive)
+            {
+                Plugin.Log.Debug("Destroying menu bb...");
+                Destroy(colliderCubeActive);
+                colliderBBactive = false;
+                colliderBBFireOnce = true;
+            }
+        }
+
+        private void AttatchColliderScript()
+        {
+            Plugin.Log.Debug("Attatching collider script to scene bb...");
+            bbColliderScript =  activeCubeHolder.AddComponent<BBCollider>();
         }
     }
 }
