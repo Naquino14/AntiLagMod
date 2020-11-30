@@ -57,6 +57,7 @@ namespace AntiLagMod
         private bool trackingIssueDetection;
         private float driftThreshold;
 
+        public SaberManager saberManager;
         public Saber rSaber;
         public Saber lSaber;
         private Vector3 rSaberPos;
@@ -124,10 +125,13 @@ namespace AntiLagMod
         }
         private void Update()
         {
+            if (criticalError)
+            {
+                SettingsView.Disable();
+            }
             CheckFrameRate();
-            //Plugin.Log.Debug("" + modEnabled);
+            //Plugin.Log.Debug("" + activePause);
             bbScale = new Vector3(driftThreshold / bbScaleDivider, driftThreshold / bbScaleDivider, driftThreshold / bbScaleDivider);
-            //Plugin.Log.Debug("" + bbScaleDivider);
             if (isLevel && modEnabled)
             {
                 if (waitThenActiveFireOnce)
@@ -161,7 +165,7 @@ namespace AntiLagMod
                     
                     // check saber positions
                     string whichController = "(error getting which controller)";
-
+                    
                     CheckSaberPos("last");
                     if(framesSinceLastSaberPosUpdate == 1)
                     {
@@ -206,6 +210,8 @@ namespace AntiLagMod
                 }
 
                 #endregion
+                //Plugin.Log.Debug("" + rSaberPos);
+                //Plugin.Log.Debug("LF: " + prevRSaberPos);
             }
             #region drift detection settings
 
@@ -223,7 +229,7 @@ namespace AntiLagMod
                     activeCubeHolder.transform.localScale = bbScale;
                 }
             }
-
+            
             #endregion
         }
         private void OnEnable()
@@ -259,7 +265,7 @@ namespace AntiLagMod
 
             } catch(Exception exception)
             {
-                CriticalErrorHandler(true, 239, exception);
+                CriticalErrorHandler(true, 252, exception);
             } // gabe shut the fi*ck up that wasnt funny (bad wrord))
               // im going to come to your house andd eat all your food
 
@@ -289,7 +295,7 @@ namespace AntiLagMod
                 }
                 catch (Exception exception)
                 {
-                    CriticalErrorHandler(true, 264, exception);
+                    CriticalErrorHandler(true, 287, exception);
                 }
             }
 
@@ -298,15 +304,26 @@ namespace AntiLagMod
 
         private void Pause()
         {
+            Plugin.Log.Debug("Pausing...");
             activePause = false;
             PauseController.Pause();
         }
         private void FindSabers()
         {
             Plugin.Log.Debug("Looking for sabers...");
+            try
+            {
+                saberManager = Resources.FindObjectsOfTypeAll<SaberManager>().FirstOrDefault();
+                rSaber = saberManager.rightSaber;
+                lSaber = saberManager.leftSaber;
+            } catch (Exception exception)
+            {
+                CriticalErrorHandler(true, 313, exception);
+            }
+            Plugin.Log.Debug("Success! Found sabers.");
             //int saberTypeArrayLength = Resources.FindObjectsOfTypeAll<Saber>().Length;
-            rSaber = Resources.FindObjectsOfTypeAll<Saber>().ElementAt(0); // i hope this is right
-            lSaber = Resources.FindObjectsOfTypeAll<Saber>().ElementAt(1);
+            //rSaber = Resources.FindObjectsOfTypeAll<Saber>().ElementAt(0); // i hope this is right
+            //lSaber = Resources.FindObjectsOfTypeAll<Saber>().ElementAt(1);
             //Plugin.Log.Debug("There are " + saberTypeArrayLength + " instances of type Saber");
         }
 
@@ -366,14 +383,15 @@ namespace AntiLagMod
             isLevel = true;
 
             PauseController = Resources.FindObjectsOfTypeAll<PauseController>().FirstOrDefault();
+            FindSabers();
             if (PauseController == null)
             {
-                CriticalErrorHandler(true, 339);
+                CriticalErrorHandler(true, 371);
             }
-            FindSabers();
+            
             if (rSaber == null || lSaber == null)
             {
-                CriticalErrorHandler(true, 345);
+                CriticalErrorHandler(true, 376);
             }
             
 
@@ -385,6 +403,7 @@ namespace AntiLagMod
             isLevel = false;
             activePause = false;
             DestroyBBCollider();
+            ResetSaberPos();
         }
 
         private void OnLevelClear(StandardLevelScenesTransitionSetupDataSO unused, LevelCompletionResults unusedResult) // level cleared delegate
@@ -393,6 +412,7 @@ namespace AntiLagMod
             isLevel = false;
             activePause = false;
             DestroyBBCollider();
+            ResetSaberPos();
         }
 
         private void OnLevelQuit(StandardLevelScenesTransitionSetupDataSO unused, LevelCompletionResults unusedResult) // level quit delegate
@@ -402,6 +422,7 @@ namespace AntiLagMod
             activePause = false;
             subToResumeFireOnce = true;
             DestroyBBCollider();
+            ResetSaberPos();
         }
 
         private void OnLevelRestart(StandardLevelScenesTransitionSetupDataSO unused, LevelCompletionResults unusedResult)
@@ -470,13 +491,13 @@ namespace AntiLagMod
             Instance.boundingBoxEnabled = true;
         }
 
-        private void CreateBBCollider()
+        private void CreateBBCollider() // broken atm
         {
             Plugin.Log.Debug("Attempting to create scene bb...");
             colliderCubeActive = Instantiate(cubeHolder);
             colliderCubeActive.transform.localScale = bbScale;
             colliderBBactive = true;
-            GameObject dasCuuben = colliderCubeActive.GetComponentInChildren<GameObject>();
+            //GameObject dasCuuben = colliderCubeActive.GetComponentInChildren<GameObject>();
             
             try
             {
@@ -484,7 +505,7 @@ namespace AntiLagMod
             } catch (Exception exception)
             {
                 Plugin.Log.Warn("Gameobject dasCuuben was not found...");
-                CriticalErrorHandler(true, 479, exception);
+                CriticalErrorHandler(true, 500, exception);
             }
         }
 
@@ -503,6 +524,12 @@ namespace AntiLagMod
         {
             Plugin.Log.Debug("Attatching collider script to scene bb...");
             bbColliderScript =  activeCubeHolder.AddComponent<BBCollider>();
+        }
+
+        private void ResetSaberPos()
+        {
+            rSaberPos = Vector3.zero;
+            lSaberPos = Vector3.zero;
         }
     }
 }

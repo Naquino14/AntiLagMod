@@ -5,7 +5,7 @@
     </horizontal>
     <vertical vertical-fit="PreferredSize">
       <horizontal horizontal-fit="PreferredSize">
-        <bool-setting value="mod-enabled" hover-hint="Enable Anti Lag Mod?" text="Anti Lag Mod Enabled" apply-on-change="true"></bool-setting>
+        <bool-setting value="mod-enabled" hover-hint="Enable Anti Lag Mod?" text="~is-mod-enabled" apply-on-change="true"></bool-setting>
       </horizontal>
       <horizontal horizontal-fit="PreferredSize">
         <text text="Frame Drop Threshold"></text>

@@ -96,12 +96,18 @@ namespace AntiLagMod.settings.views
             Process.Start("https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLahKLy8pQdCM0SiXNn3EfGIXX19QGzUG3");
         }
 
-
+        [UIValue("is-mod-enabled")]
+        public static string isModEnabled = "Anti Lag Mod Enabled";
 
         private void SaveConfig() // prob doesnt actually do anything useful but its here anyway
         {
             Plugin.SaveConfig();
             AntiLagModController.Refresh();
+        }
+
+        public static void Disable()
+        {
+            isModEnabled = "A critical error has been encountered. Mod is disabled.";
         }
 
     }
