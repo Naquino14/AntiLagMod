@@ -504,11 +504,11 @@ namespace AntiLagMod
             colliderCubeActive = Instantiate(cubeHolder);
             colliderCubeActive.transform.localScale = bbScale;
             colliderBBactive = true;
-            //GameObject dasCuuben = colliderCubeActive.GetComponentInChildren<GameObject>();
+            MeshRenderer dasCuuben = colliderCubeActive.GetComponentInChildren<MeshRenderer>();
             
             try
             {
-                //dasCuuben.SetActive(false);
+                dasCuuben.enabled = false;
             } catch (Exception exception)
             {
                 Plugin.Log.Warn("Gameobject dasCuuben was not found...");
