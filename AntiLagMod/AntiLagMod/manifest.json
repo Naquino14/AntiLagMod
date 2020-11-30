@@ -3,7 +3,7 @@
   "id": "AntiLagMod",
   "name": "AntiLagMod",
   "author": "Naquino14",
-  "version": "0.4.19",
+  "version": "0.4.20",
   "description": "An Anti-Lag mod that pauses your game after a certain amount of frames are dropped. Dedicated to my GTX 1050 Mobile",
   "gameVersion": "1.13.0",
   "dependsOn": {

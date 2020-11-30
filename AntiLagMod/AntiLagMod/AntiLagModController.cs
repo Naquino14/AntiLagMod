@@ -64,6 +64,10 @@ namespace AntiLagMod
         private Vector3 lSaberPos;
         private Vector3 prevRSaberPos;
         private Vector3 prevLSaberPos;
+        private Quaternion rSaberRot;
+        private Quaternion lSaberRot;
+        private Quaternion prevRSaberRot;
+        private Quaternion prevLSaberRot;
         private Transform rSaberTransform;
         private Transform lSaberTransform;
         private int framesSinceLastSaberPosUpdate = 0;
@@ -167,7 +171,7 @@ namespace AntiLagMod
                     string whichController = "(error getting which controller)";
                     
                     CheckSaberPos("last");
-                    if(framesSinceLastSaberPosUpdate == 1)
+                    if(framesSinceLastSaberPosUpdate == 1) // lag behind 1 frame
                     {
                         framesSinceLastSaberPosUpdate = 0;
                         CheckSaberPos("first");
@@ -178,12 +182,12 @@ namespace AntiLagMod
                     #region tracking loss detection
 
                     //tracking loss
-                    if (rSaberPos.x == prevRSaberPos.x && rSaberPos.y == prevRSaberPos.y && rSaberPos.z == prevRSaberPos.z)
+                    if (rSaberPos == prevRSaberPos && rSaberRot == prevRSaberRot)
                     {
                         trackingLossDetected = true;
                         whichController = "left";
                     }
-                    if (lSaberPos.x == prevLSaberPos.x && lSaberPos.y == prevLSaberPos.y && lSaberPos.z == prevLSaberPos.z)
+                    if (lSaberPos == prevLSaberPos && rSaberRot == prevLSaberRot)
                     {
                         trackingLossDetected = true;
                         whichController = "right";
@@ -200,15 +204,14 @@ namespace AntiLagMod
 
                     // nothing here but us chickens
 
-                    if (colliderBBFireOnce)
-                    {
-                        colliderBBFireOnce = false;
-                        CreateBBCollider();
-                    }
-
                     #endregion
                 }
 
+                if (colliderBBFireOnce)
+                {
+                    colliderBBFireOnce = false;
+                    CreateBBCollider();
+                }
                 #endregion
                 //Plugin.Log.Debug("" + rSaberPos);
                 //Plugin.Log.Debug("LF: " + prevRSaberPos);
@@ -280,6 +283,8 @@ namespace AntiLagMod
                 {
                     rSaberPos = rSaber.handlePos;
                     lSaberPos = lSaber.handlePos;
+                    rSaberRot = rSaber.handleRot;
+                    lSaberRot = lSaber.handleRot;
                 }
                 catch (Exception exception)
                 {
@@ -292,6 +297,8 @@ namespace AntiLagMod
                 {
                     prevRSaberPos = rSaber.handlePos;
                     prevLSaberPos = lSaber.handlePos;
+                    prevRSaberRot = rSaber.handleRot;
+                    prevLSaberRot = lSaber.handleRot;
                 }
                 catch (Exception exception)
                 {
