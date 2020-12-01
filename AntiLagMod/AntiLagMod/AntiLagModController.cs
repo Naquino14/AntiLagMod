@@ -185,12 +185,12 @@ namespace AntiLagMod
                     if (rSaberPos == prevRSaberPos && rSaberRot == prevRSaberRot)
                     {
                         trackingLossDetected = true;
-                        whichController = "left";
+                        whichController = "right";
                     }
-                    if (lSaberPos == prevLSaberPos && rSaberRot == prevLSaberRot)
+                    if (lSaberPos == prevLSaberPos && lSaberRot == prevLSaberRot)
                     {
                         trackingLossDetected = true;
-                        whichController = "right";
+                        whichController = "left";
                     }
                     if (activePause && trackingLossDetected)
                     {
