@@ -6,10 +6,13 @@ If the mod isnt working properly, It will tell you in the settings that it has s
 
 Features: 
 Frame drop detection
-Controller disconnection
+
+Controller disconnection detection
 
 Future features:
+
 Drift Detection
+
 Text in the pause menu telling you why the game was paused.
 
 # Installation:
