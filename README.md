@@ -5,6 +5,7 @@ An anti lag mod for Beatsaber. Pauses your game after a desired threshold of fra
 If the mod isnt working properly, It will tell you in the settings that it has shut itself off to prevent further problems. You can fix this by restarting your game. If you find bugs, report them here, game logs are appreciated! You can find the log in `\Beat Saber\Logs\_latest.txt`
 
 Features: 
+
 Frame drop detection
 
 Controller disconnection detection
