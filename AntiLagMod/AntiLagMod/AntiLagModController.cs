@@ -170,11 +170,11 @@ namespace AntiLagMod
                     // check saber positions
                     string whichController = "(error getting which controller)";
                     
-                    CheckSaberPos("last");
+                    CheckSaberPos(Frame.Last);
                     if(framesSinceLastSaberPosUpdate == 1) // lag behind 1 frame
                     {
                         framesSinceLastSaberPosUpdate = 0;
-                        CheckSaberPos("first");
+                        CheckSaberPos(Frame.First);
                     }
                     framesSinceLastSaberPosUpdate++;
                     //Plugin.Log.Debug("x" + rSaberPos.x + " y" + rSaberPos.y + " z" + rSaberPos.z); // log saber position
@@ -275,35 +275,42 @@ namespace AntiLagMod
             
         }
 
-        private void CheckSaberPos(string firstOrLast)
+        private enum Frame
         {
-            if (firstOrLast == "first")
+            First,
+            Last
+        }
+        private void CheckSaberPos(Frame frame) // change this to check null intsead of try/catch
+        {
+            switch (frame)
             {
-                try
-                {
-                    rSaberPos = rSaber.handlePos;
-                    lSaberPos = lSaber.handlePos;
-                    rSaberRot = rSaber.handleRot;
-                    lSaberRot = lSaber.handleRot;
-                }
-                catch (Exception exception)
-                {
-                    CriticalErrorHandler(true, 284, exception);
-                }
-            }
-            if (firstOrLast == "last")
-            {
-                try
-                {
-                    prevRSaberPos = rSaber.handlePos;
-                    prevLSaberPos = lSaber.handlePos;
-                    prevRSaberRot = rSaber.handleRot;
-                    prevLSaberRot = lSaber.handleRot;
-                }
-                catch (Exception exception)
-                {
-                    CriticalErrorHandler(true, 298, exception);
-                }
+                case Frame.First:
+                    if (rSaber != null || lSaber == null)
+                    {
+                        rSaberPos = rSaber.handlePos;
+                        lSaberPos = lSaber.handlePos;
+                        rSaberRot = rSaber.handleRot;
+                        lSaberRot = lSaber.handleRot;
+                    } else
+                    {
+                        Plugin.Log.Warn("Sabers could not be found.");
+                        CriticalErrorHandler(true, 290);
+                    }
+                    break;
+                case Frame.Last:
+                    if (rSaber == null || lSaber == null)
+                    {
+                        prevRSaberPos = rSaber.handlePos;
+                        prevLSaberPos = lSaber.handlePos;
+                        prevRSaberRot = rSaber.handleRot;
+                        prevLSaberRot = lSaber.handleRot;
+                    } else
+                    {
+                        Plugin.Log.Warn("Sabers could not be found.");
+                        CriticalErrorHandler(true);
+                    }
+                    break;
+
             }
 
 
@@ -388,7 +395,7 @@ namespace AntiLagMod
         {
             //Plugin.Log.Debug("Level Started");
             isLevel = true;
-
+            Plugin.Log.Debug("Level started... Looking for PauseController");
             PauseController = Resources.FindObjectsOfTypeAll<PauseController>().FirstOrDefault();
             FindSabers();
             if (PauseController == null)
@@ -541,10 +548,10 @@ namespace AntiLagMod
             lSaberPos = Vector3.zero;
             prevRSaberPos = Vector3.zero;
             prevLSaberPos = Vector3.zero;
-            rSaberRot = Quaternion.Euler(Vector3.zero);
-            lSaberRot = Quaternion.Euler(Vector3.zero);
-            prevRSaberRot = Quaternion.Euler(Vector3.zero);
-            prevLSaberRot = Quaternion.Euler(Vector3.zero);
+            rSaberRot = Quaternion.identity;
+            lSaberRot = Quaternion.identity;
+            prevRSaberRot = Quaternion.identity;
+            prevLSaberRot = Quaternion.identity;
         }
     }
 }
