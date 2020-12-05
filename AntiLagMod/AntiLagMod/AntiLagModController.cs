@@ -72,7 +72,8 @@ namespace AntiLagMod
         private Transform lSaberTransform;
         private int framesSinceLastSaberPosUpdate = 0;
 
-        public PlayerHeightDetector PlayerHeightDetector;
+        private PlayerSpecificSettings playerSpecificSettings;
+        private float playerHeight;
 
         public static PauseController PauseController;
 
@@ -138,6 +139,7 @@ namespace AntiLagMod
             bbScale = new Vector3(driftThreshold / bbScaleDivider, driftThreshold / bbScaleDivider, driftThreshold / bbScaleDivider);
             if (isLevel && modEnabled)
             {
+                Plugin.Log.Debug(rSaber.transform.name);
                 if (waitThenActiveFireOnce)
                 {
                     StartCoroutine(WaitThenActive());
@@ -552,6 +554,36 @@ namespace AntiLagMod
             lSaberRot = Quaternion.identity;
             prevRSaberRot = Quaternion.identity;
             prevLSaberRot = Quaternion.identity;
+        }
+
+        public enum SaberType
+        {
+            RightSaber,
+            LeftSaber
+        }
+
+        public static void SabersLeftBB(SaberType whichSaber)
+        {
+            if (whichSaber == SaberType.RightSaber)
+            {
+                Plugin.Log.Warn("Right saber has left the bounding box.");
+                
+            }
+            if (whichSaber == SaberType.LeftSaber)
+            {
+                Plugin.Log.Warn("Left saber has left the bounding box.");
+            }
+        }
+
+        private void FindPlayerHeight()
+        {
+            try
+            {
+                playerHeight = playerSpecificSettings.playerHeight;
+            } catch (Exception exception)
+            {
+                CriticalErrorHandler(true, 582, exception);
+            }
         }
     }
 }

@@ -69,11 +69,11 @@ namespace AntiLagMod.settings.views
         }
 
         [UIValue("bb-min")]
-        private float bbMin = 10f; // for testing purposes
+        private float bbMin = 1f; // for testing purposes
         
 
         [UIValue("bb-max")]
-        private float bbMax = 100f; // for testing purposes
+        private float bbMax = 25f; // for testing purposes
 
 
         [UIValue("drift-threshold")]
