@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 using AntiLagMod.settings.views;
 using AntiLagMod.settings;
 using UnityEngine.Events;
@@ -28,6 +29,7 @@ namespace AntiLagMod
         private BBCollider bbColliderScript;
 
         public bool criticalError;
+        public bool isPaused;
 
         private bool modEnabled;
         private float frameThreshold;
@@ -72,9 +74,8 @@ namespace AntiLagMod
         private Transform lSaberTransform;
         private int framesSinceLastSaberPosUpdate = 0;
 
-        private PlayerSpecificSettings playerSpecificSettings;
         private float playerHeight;
-
+        
         public static PauseController PauseController;
 
         // tracking issues here ^^^
@@ -101,6 +102,7 @@ namespace AntiLagMod
         Vector3 bbScale;
         private float bbScaleDivider = 20;
 
+        private bool attatchColliderScriptFireOnce = true;
         #endregion
 
         #region Monobehaviour Messages
@@ -135,11 +137,9 @@ namespace AntiLagMod
                 SettingsView.Disable();
             }
             CheckFrameRate();
-            //Plugin.Log.Debug("" + activePause);
             bbScale = new Vector3(driftThreshold / bbScaleDivider, driftThreshold / bbScaleDivider, driftThreshold / bbScaleDivider);
             if (isLevel && modEnabled)
             {
-                Plugin.Log.Debug(rSaber.transform.name);
                 if (waitThenActiveFireOnce)
                 {
                     StartCoroutine(WaitThenActive());
@@ -206,6 +206,12 @@ namespace AntiLagMod
 
                     // nothing here but us chickens
 
+                    if (attatchColliderScriptFireOnce)
+                    {
+                        AttatchColliderScript();
+                        attatchColliderScriptFireOnce = false;
+                    }
+
                     #endregion
                 }
 
@@ -226,15 +232,32 @@ namespace AntiLagMod
                 {
                     Plugin.Log.Debug("Attempting to make menu bb...");
                     bbFireOnce = false;
-                    activeCubeHolder = Instantiate(cubeHolder);
+                    try
+                    {
+                        activeCubeHolder = Instantiate(cubeHolder);
+                    } catch (Exception exception)
+                    {
+                        CriticalErrorHandler(true, 237, exception);
+                    }
+                    
+                    activeCubeHolder.transform.position = new Vector3(0, playerHeight, 0);
                     activeCubeActive = true;
                 }
                 if (activeCubeActive)
                 {
                     activeCubeHolder.transform.localScale = bbScale;
+                    activeCubeHolder.transform.position = new Vector3(0, playerHeight, 0);
                 }
             }
-            
+
+            #endregion
+            #region diagnostics (this is temporary)
+
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                Diagnose();
+            }
+
             #endregion
         }
         private void OnEnable()
@@ -322,8 +345,10 @@ namespace AntiLagMod
         {
             Plugin.Log.Debug("Pausing...");
             activePause = false;
+            isPaused = true;
             PauseController.Pause();
         }
+
         private void FindSabers()
         {
             Plugin.Log.Debug("Looking for sabers...");
@@ -346,6 +371,7 @@ namespace AntiLagMod
         public static void Refresh() // refresh the class variables to equal the property variables
         {
             // I farted really hard when I wrote this
+            Plugin.Log.Debug("Refreshing Variables...");
             Instance.modEnabled = Configuration.ModEnabled;
             Instance.frameDropDetection = Configuration.FrameDropDetectionEnabled;
             Instance.frameThreshold = Configuration.FrameThreshold;
@@ -353,6 +379,8 @@ namespace AntiLagMod
 
             Instance.trackingIssueDetection = Configuration.TrackingErrorDetectionEnabled;
             Instance.driftThreshold = Configuration.DriftThreshold;
+
+            Instance.playerHeight = Configuration.PlayerHeight;
         }
 
         private void CheckFrameRate()
@@ -382,6 +410,7 @@ namespace AntiLagMod
             Plugin.Log.Debug("Resuming complete, reactivating active pause in 2 seconds");
             yield return new WaitForSeconds(2);
             activePause = true;
+            isPaused = false;
         }
 
         private void CheckEvents() // simply subscribes to the the events
@@ -397,6 +426,7 @@ namespace AntiLagMod
         {
             //Plugin.Log.Debug("Level Started");
             isLevel = true;
+            isPaused = false;
             Plugin.Log.Debug("Level started... Looking for PauseController");
             PauseController = Resources.FindObjectsOfTypeAll<PauseController>().FirstOrDefault();
             FindSabers();
@@ -422,6 +452,7 @@ namespace AntiLagMod
             activePause = false;
             DestroyBBCollider();
             ResetSaberPos();
+            ResetFireOnce();
         }
 
         private void OnLevelClear(StandardLevelScenesTransitionSetupDataSO unused, LevelCompletionResults unusedResult) // level cleared delegate
@@ -431,6 +462,7 @@ namespace AntiLagMod
             activePause = false;
             DestroyBBCollider();
             ResetSaberPos();
+            ResetFireOnce();
         }
 
         private void OnLevelQuit(StandardLevelScenesTransitionSetupDataSO unused, LevelCompletionResults unusedResult) // level quit delegate
@@ -441,6 +473,7 @@ namespace AntiLagMod
             subToResumeFireOnce = true;
             DestroyBBCollider();
             ResetSaberPos();
+            ResetFireOnce();
         }
 
         private void OnLevelRestart(StandardLevelScenesTransitionSetupDataSO unused, LevelCompletionResults unusedResult)
@@ -496,6 +529,7 @@ namespace AntiLagMod
                 modEnabled = false;
             }
         }
+
         public void FlowCoordinatorBackPressed()
         {
             boundingBoxEnabled = false;
@@ -514,6 +548,7 @@ namespace AntiLagMod
             Plugin.Log.Debug("Attempting to create scene bb...");
             colliderCubeActive = Instantiate(cubeHolder);
             colliderCubeActive.transform.localScale = bbScale;
+            colliderCubeActive.transform.position = new Vector3(0, playerHeight, 0);
             colliderBBactive = true;
             MeshRenderer dasCuuben = colliderCubeActive.GetComponentInChildren<MeshRenderer>();
             
@@ -575,15 +610,20 @@ namespace AntiLagMod
             }
         }
 
-        private void FindPlayerHeight()
+        private void ResetFireOnce()
         {
-            try
-            {
-                playerHeight = playerSpecificSettings.playerHeight;
-            } catch (Exception exception)
-            {
-                CriticalErrorHandler(true, 582, exception);
-            }
+            attatchColliderScriptFireOnce = false;
+        }
+
+        private void Diagnose()
+        {
+            Refresh();
+            Plugin.Log.Debug("Active pause: " + activePause);
+            Plugin.Log.Debug("Is Level: " + isLevel);
+            Plugin.Log.Debug("Bounding box enabled: " + boundingBoxEnabled);
+            Plugin.Log.Debug("Is pause: " + isPaused);
+            Plugin.Log.Debug("Player Height: " + playerHeight);
+            Plugin.Log.Debug("Critical Error: " + criticalError);
         }
     }
 }

@@ -13,6 +13,7 @@ namespace AntiLagMod.settings
         public static float WaitThenActive { get; internal set; }
         public static bool TrackingErrorDetectionEnabled { get; internal set; }
         public static float DriftThreshold { get; internal set; }
+        public static float PlayerHeight { get; internal set; } // set this manually bc game is big stupid and wont let me do it automatically... it isnt really important anyway
 
         internal static void Init(Config config)
         {
@@ -27,6 +28,7 @@ namespace AntiLagMod.settings
             FrameThreshold = PluginConfig.Instance.frameThreshold;
             TrackingErrorDetectionEnabled = PluginConfig.Instance.trackingErrorDetectionEnabled;
             DriftThreshold = PluginConfig.Instance.driftThreshold;
+            PlayerHeight = PluginConfig.Instance.playerHeight;
         }
         internal static void Save()
         {
@@ -37,6 +39,7 @@ namespace AntiLagMod.settings
             PluginConfig.Instance.frameThreshold = FrameThreshold;
             PluginConfig.Instance.trackingErrorDetectionEnabled = TrackingErrorDetectionEnabled;
             PluginConfig.Instance.driftThreshold = DriftThreshold;
+            PluginConfig.Instance.playerHeight = PlayerHeight;
         }
     }
 }

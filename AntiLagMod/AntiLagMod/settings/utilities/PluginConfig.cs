@@ -16,6 +16,7 @@ namespace AntiLagMod.settings.utilities
         public float waitThenActive = 1f;
         public bool trackingErrorDetectionEnabled;
         public float driftThreshold = 10f;
+        public float playerHeight = 1.2f;
 
     }
 }
