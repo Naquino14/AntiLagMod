@@ -323,22 +323,18 @@ namespace AntiLagMod
                     }
                     break;
                 case Frame.Last:
-                    if (rSaber == null || lSaber == null)
+                    if (rSaber != null || lSaber != null)
                     {
                         prevRSaberPos = rSaber.handlePos;
                         prevLSaberPos = lSaber.handlePos;
                         prevRSaberRot = rSaber.handleRot;
                         prevLSaberRot = lSaber.handleRot;
-                    } else
-                    {
+
                         Plugin.Log.Warn("Sabers could not be found.");
-                        CriticalErrorHandler(true);
+                        CriticalErrorHandler(true, 330);
                     }
                     break;
-
             }
-
-
         }
 
         private void Pause()
