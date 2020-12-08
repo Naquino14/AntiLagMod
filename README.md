@@ -10,12 +10,16 @@ Frame drop detection
 
 Controller disconnection detection
 
-Future features:
+WIP Features:
 
 Drift Detection
+
+Future features:
 
 Text in the pause menu telling you why the game was paused.
 
 # Installation:
 Extract the zipped folder and copy the dll into your `Beat Saber\Plugins` folder.
 
+# Advanced Settings:
+This isnt that very important but if you feel the need to change the Y offset of the Bounding Box you can do so under `playerHeight` in `BeatSaber\UserData\AntiLagMod.json`
