@@ -10,13 +10,14 @@ Frame drop detection
 
 Controller disconnection detection
 
-WIP Features:
-
 Drift Detection
+
+WIP Features:
+Text in the pause menu telling you why the game was paused.
 
 Future features:
 
-Text in the pause menu telling you why the game was paused.
+???
 
 # Installation:
 Extract the zipped folder and copy the dll into your `Beat Saber\Plugins` folder.
