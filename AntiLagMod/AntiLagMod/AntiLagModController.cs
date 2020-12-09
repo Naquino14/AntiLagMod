@@ -319,7 +319,7 @@ namespace AntiLagMod
                     } else
                     {
                         Plugin.Log.Warn("Sabers could not be found.");
-                        CriticalErrorHandler(true, 290);
+                        CriticalErrorHandler(true, 315);
                     }
                     break;
                 case Frame.Last:
@@ -331,7 +331,7 @@ namespace AntiLagMod
                         prevLSaberRot = lSaber.handleRot;
 
                         Plugin.Log.Warn("Sabers could not be found.");
-                        CriticalErrorHandler(true, 330);
+                        CriticalErrorHandler(true, 328);
                     }
                     break;
             }
@@ -399,6 +399,7 @@ namespace AntiLagMod
             Plugin.Log.Debug("Waiting for the start of the level...");
             yield return new WaitForSeconds(waitThenActiveTime);
             activePause = true;
+            Plugin.Log.Debug("Active pause enabled.");
         }
 
         private IEnumerator WaitThenReActivate() // wait 2 seconds before reactivating the pause mechanism after its been fired
@@ -407,6 +408,7 @@ namespace AntiLagMod
             yield return new WaitForSeconds(2);
             activePause = true;
             isPaused = false;
+            Plugin.Log.Debug("Active Pause re-enabled.");
         }
 
         private void CheckEvents() // simply subscribes to the the events
@@ -425,6 +427,7 @@ namespace AntiLagMod
             isPaused = false;
             Plugin.Log.Debug("Level started... Looking for PauseController");
             PauseController = Resources.FindObjectsOfTypeAll<PauseController>().FirstOrDefault();
+            Plugin.Log.Debug("Looking for Sabers...");
             FindSabers();
             if (PauseController == null)
             {
@@ -437,7 +440,10 @@ namespace AntiLagMod
                 Plugin.Log.Warn("FindSabers() not fired or failed...");
                 CriticalErrorHandler(true, 393);
             }
-            
+            if (!criticalError)
+            {
+                Plugin.Log.Debug("Success! Found PauseController and Sabers.");
+            }
 
         }
 
@@ -483,7 +489,7 @@ namespace AntiLagMod
             StartCoroutine(WaitThenReActivate());
         }
         
-        private  void CriticalErrorHandler(bool error, int lineNumber = 0, Exception exception = null) // i overdid this but idrc
+        private void CriticalErrorHandler(bool error, int lineNumber = 0, Exception exception = null) // i overdid this but idrc
         {
             int _case = 0;
             if (lineNumber == 0)
@@ -620,6 +626,12 @@ namespace AntiLagMod
             Plugin.Log.Debug("Is pause: " + isPaused);
             Plugin.Log.Debug("Player Height: " + playerHeight);
             Plugin.Log.Debug("Critical Error: " + criticalError);
+        }
+
+        public static void ExternalCriticalError(string ScriptLocation = null, int lineNumber = 0, Exception exception = (Exception)null)
+        {
+            Plugin.Log.Warn("A critical error has been encountered in " + ScriptLocation +  ". ");
+            Instance.CriticalErrorHandler(true, lineNumber, exception);
         }
     }
 }

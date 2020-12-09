@@ -136,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ALMFlowCoordinator.cs" />
+    <Compile Include="TextObject.cs" />
     <Compile Include="settings\Configuration.cs" />
     <Compile Include="settings\SettingsUI.cs" />
     <Compile Include="settings\utilities\PluginConfig.cs" />
