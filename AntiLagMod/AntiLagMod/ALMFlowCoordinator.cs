@@ -35,12 +35,10 @@ namespace AntiLagMod
                     SetTitle("Anti Lag Mod");
                     showBackButton = true;
                     ProvideInitialViewControllers(settingsView);
-                    
-                    
                 }
             } catch (Exception exception)
             {
-                Plugin.Log.Error(exception);
+                AntiLagModController.ExternalCriticalError("ALMFlowCoordinator.cs", 37, exception);
             }
         }
 
