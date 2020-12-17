@@ -103,6 +103,8 @@ namespace AntiLagMod
         private float bbScaleDivider = 20;
 
         private bool attatchColliderScriptFireOnce = true;
+
+        private TextObj textObj;
         #endregion
 
         #region Monobehaviour Messages
@@ -129,6 +131,13 @@ namespace AntiLagMod
             trackingActiveFireOnce = true;
             CheckEvents();
             LoadAssetBundles();
+            try
+            {
+                textObj = Resources.FindObjectsOfTypeAll<TextObj>().FirstOrDefault();
+            } catch (Exception exception)
+            {
+                CriticalErrorHandler(true, 136, exception);
+            }
         }
         private void Update()
         {
@@ -319,7 +328,7 @@ namespace AntiLagMod
                     } else
                     {
                         Plugin.Log.Warn("Sabers could not be found.");
-                        CriticalErrorHandler(true, 315);
+                        CriticalErrorHandler(true, 324);
                     }
                     break;
                 case Frame.Last:
@@ -329,9 +338,10 @@ namespace AntiLagMod
                         prevLSaberPos = lSaber.handlePos;
                         prevRSaberRot = rSaber.handleRot;
                         prevLSaberRot = lSaber.handleRot;
-
+                    } else
+                    {
                         Plugin.Log.Warn("Sabers could not be found.");
-                        CriticalErrorHandler(true, 328);
+                        CriticalErrorHandler(true, 337);
                     }
                     break;
             }
@@ -629,6 +639,12 @@ namespace AntiLagMod
             Plugin.Log.Debug("Is pause: " + isPaused);
             Plugin.Log.Debug("Player Height: " + playerHeight);
             Plugin.Log.Debug("Critical Error: " + criticalError);
+        }
+
+        
+        private void SetText(string message, Color color)
+        {
+            
         }
 
         public static void ExternalCriticalError(string ScriptLocation = null, int lineNumber = 0, Exception exception = (Exception)null)

@@ -31,6 +31,7 @@ namespace AntiLagMod
         }
         public void Create()
         {
+            Plugin.Log.Debug("Creating text object");
             try
             {
                 // setup text obj
