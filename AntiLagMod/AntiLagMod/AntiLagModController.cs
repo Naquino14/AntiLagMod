@@ -310,7 +310,7 @@ namespace AntiLagMod
             switch (frame)
             {
                 case Frame.First:
-                    if (rSaber != null || lSaber == null)
+                    if (rSaber != null || lSaber != null)
                     {
                         rSaberPos = rSaber.handlePos;
                         lSaberPos = lSaber.handlePos;
@@ -425,24 +425,27 @@ namespace AntiLagMod
             //Plugin.Log.Debug("Level Started");
             isLevel = true;
             isPaused = false;
-            Plugin.Log.Debug("Level started... Looking for PauseController");
-            PauseController = Resources.FindObjectsOfTypeAll<PauseController>().FirstOrDefault();
-            Plugin.Log.Debug("Looking for Sabers...");
-            FindSabers();
-            if (PauseController == null)
+            if (modEnabled)
             {
-                Plugin.Log.Warn("PauseController not found.");
-                CriticalErrorHandler(true, 392);
-            }
-            
-            if (rSaber == null || lSaber == null)
-            {
-                Plugin.Log.Warn("FindSabers() not fired or failed...");
-                CriticalErrorHandler(true, 393);
-            }
-            if (!criticalError)
-            {
-                Plugin.Log.Debug("Success! Found PauseController and Sabers.");
+                Plugin.Log.Debug("Level started... Looking for PauseController");
+                PauseController = Resources.FindObjectsOfTypeAll<PauseController>().FirstOrDefault();
+                Plugin.Log.Debug("Looking for Sabers...");
+                FindSabers();
+                if (PauseController == null)
+                {
+                    Plugin.Log.Warn("PauseController not found.");
+                    CriticalErrorHandler(true, 392);
+                }
+
+                if (rSaber == null || lSaber == null)
+                {
+                    Plugin.Log.Warn("FindSabers() not fired or failed...");
+                    CriticalErrorHandler(true, 393);
+                }
+                if (!criticalError)
+                {
+                    Plugin.Log.Debug("Success! Found PauseController and Sabers.");
+                }
             }
 
         }
