@@ -54,7 +54,7 @@ namespace AntiLagMod
         private bool trackingActiveFireOnce;
 
         private bool driftDetected;
-        private bool trackingLossDetected;
+        private bool trackingLossDetected = false;
 
         private bool trackingIssueDetection;
         private float driftThreshold;
@@ -72,6 +72,8 @@ namespace AntiLagMod
         private Quaternion prevLSaberRot;
         private Transform rSaberTransform;
         private Transform lSaberTransform;
+        private BBCollider rSaberCollider;
+        private BBCollider lSaberCollider;
         private int framesSinceLastSaberPosUpdate = 0;
 
         private float playerHeight;
@@ -86,7 +88,6 @@ namespace AntiLagMod
         private Material cubeMaterial;
         private Shader cubeShader;
         private BoxCollider cubeCollider;
-        //private string assetBundlePath;
 
         private GameObject activeCubeHolder;
         private bool activeCubeActive = false; // bruh\
@@ -103,8 +104,6 @@ namespace AntiLagMod
         private float bbScaleDivider = 20;
 
         private bool attatchColliderScriptFireOnce = true;
-
-        private TextObj textObj;
         #endregion
 
         #region Monobehaviour Messages
@@ -115,10 +114,10 @@ namespace AntiLagMod
             if (Instance != null)
             {
                 Plugin.Log?.Warn($"Instance of {GetType().Name} already exists, destroying.");
-                GameObject.DestroyImmediate(this);
+                DestroyImmediate(this);
                 return;
             }
-            GameObject.DontDestroyOnLoad(this); // Don't destroy this object on scene changes
+            DontDestroyOnLoad(this); // Don't destroy this object on scene changes
             Instance = this;
             Plugin.Log?.Debug($"{name}: Awake()");
 
@@ -131,13 +130,7 @@ namespace AntiLagMod
             trackingActiveFireOnce = true;
             CheckEvents();
             LoadAssetBundles();
-            try
-            {
-                textObj = Resources.FindObjectsOfTypeAll<TextObj>().FirstOrDefault();
-            } catch (Exception exception)
-            {
-                CriticalErrorHandler(true, 136, exception);
-            }
+            TextObj.OnLoad();
         }
         private void Update()
         {
@@ -163,12 +156,13 @@ namespace AntiLagMod
                 #region frame drop detection
                 if (frameDropDetection)
                 {
-                    //Plugin.Log.Debug("FR: " + frameRate);
+                    //Plugin.Log.Debug("FR: " + frameRate); // check framerate
                     if (activePause && (frameRate < frameThreshold))
                     {
                         Pause();
                         Plugin.Log.Warn("FPS DROP DETECTED");
                         Plugin.Log.Debug("FPS 1 frame before drop: " + frameRate);
+                        SetText("FPS Drop Detected", Color.magenta);
                     }
                 }
                 #endregion
@@ -177,49 +171,53 @@ namespace AntiLagMod
 
                 if (trackingIssueDetection && activePause)
                 {
-                    
+                    trackingLossDetected = false;
                     // check saber positions
+                    //Debug.Log("x" + rSaberPos.x + " y" + rSaberPos.y + " z" + rSaberPos.z);
+                    //Debug.Log("px" + rSaberPos.x + " py" + rSaberPos.y + " pz" + rSaberPos.z);
                     string whichController = "(error getting which controller)";
-                    
-                    CheckSaberPos(Frame.Last);
-                    if(framesSinceLastSaberPosUpdate == 1) // lag behind 1 frame
-                    {
-                        framesSinceLastSaberPosUpdate = 0;
-                        CheckSaberPos(Frame.First);
-                    }
-                    framesSinceLastSaberPosUpdate++;
-                    //Plugin.Log.Debug("x" + rSaberPos.x + " y" + rSaberPos.y + " z" + rSaberPos.z); // log saber position
+                    CheckSaberPos(Frame.First);
 
                     #region tracking loss detection
 
-                    //tracking loss
+                    bool moveOn = false;
+                    bool both = false;
+
                     if (rSaberPos == prevRSaberPos && rSaberRot == prevRSaberRot)
                     {
                         trackingLossDetected = true;
                         whichController = "right";
+                        moveOn = true;
                     }
                     if (lSaberPos == prevLSaberPos && lSaberRot == prevLSaberRot)
                     {
                         trackingLossDetected = true;
                         whichController = "left";
+                        if (moveOn)
+                            both = true;
                     }
+                    if (both)
+                        whichController = "left & right";
                     if (activePause && trackingLossDetected)
                     {
                         Plugin.Log.Debug("Tracking issues detected with " + whichController + " controller.");
                         Pause();
+                        SetText("Tracking issues detected with " + whichController + " controller.", Color.yellow);
                     }
 
+                    CheckSaberPos(Frame.Last);
                     #endregion
 
                     #region drift detection
 
-                    // nothing here but us chickens
-
                     if (attatchColliderScriptFireOnce)
                     {
+                        Plugin.Log.Debug("Attatching collider script...");
                         AttatchColliderScript();
                         attatchColliderScriptFireOnce = false;
                     }
+
+                    // note the actual area where it pauses is a static function down below!
 
                     #endregion
                 }
@@ -230,8 +228,7 @@ namespace AntiLagMod
                     CreateBBCollider();
                 }
                 #endregion
-                //Plugin.Log.Debug("" + rSaberPos);
-                //Plugin.Log.Debug("LF: " + prevRSaberPos);
+
             }
             #region drift detection settings
 
@@ -305,8 +302,6 @@ namespace AntiLagMod
                 CriticalErrorHandler(true, 261, exception);
             } // gabe shut the fi*ck up that wasnt funny (bad wrord))
               // im going to come to your house andd eat all your food
-
-            
         }
 
         private enum Frame
@@ -314,7 +309,7 @@ namespace AntiLagMod
             First,
             Last
         }
-        private void CheckSaberPos(Frame frame) // change this to check null intsead of try/catch
+        private void CheckSaberPos(Frame frame) // not sure wether to simplify or leave this as a second stage of null checks...
         {
             switch (frame)
             {
@@ -368,10 +363,6 @@ namespace AntiLagMod
                 CriticalErrorHandler(true, 324, exception);
             }
             Plugin.Log.Debug("Success! Found sabers.");
-            //int saberTypeArrayLength = Resources.FindObjectsOfTypeAll<Saber>().Length;
-            //rSaber = Resources.FindObjectsOfTypeAll<Saber>().ElementAt(0); // i hope this is right
-            //lSaber = Resources.FindObjectsOfTypeAll<Saber>().ElementAt(1);
-            //Plugin.Log.Debug("There are " + saberTypeArrayLength + " instances of type Saber");
         }
 
         public static void Refresh() // refresh the class variables to equal the property variables
@@ -439,7 +430,6 @@ namespace AntiLagMod
             {
                 Plugin.Log.Debug("Level started... Looking for PauseController");
                 PauseController = Resources.FindObjectsOfTypeAll<PauseController>().FirstOrDefault();
-                Plugin.Log.Debug("Looking for Sabers...");
                 FindSabers();
                 if (PauseController == null)
                 {
@@ -465,6 +455,7 @@ namespace AntiLagMod
             //Plugin.Log.Debug("LevelFailed");
             isLevel = false;
             activePause = false;
+            isPaused = false;
             DestroyBBCollider();
             ResetSaberPos();
             ResetFireOnce();
@@ -475,6 +466,7 @@ namespace AntiLagMod
             //Plugin.Log.Debug("Level Ended");
             isLevel = false;
             activePause = false;
+            isPaused = false;
             DestroyBBCollider();
             ResetSaberPos();
             ResetFireOnce();
@@ -486,6 +478,7 @@ namespace AntiLagMod
             isLevel = false;
             activePause = false;
             subToResumeFireOnce = true;
+            isPaused = false;
             DestroyBBCollider();
             ResetSaberPos();
             ResetFireOnce();
@@ -581,17 +574,33 @@ namespace AntiLagMod
         {
             if (colliderBBactive)
             {
-                Plugin.Log.Debug("Destroying menu bb...");
+                Plugin.Log.Debug("Destroying scene bb...");
                 Destroy(colliderCubeActive);
                 colliderBBactive = false;
                 colliderBBFireOnce = true;
+                RemoveColliderScript();
             }
         }
 
         private void AttatchColliderScript()
         {
-            Plugin.Log.Debug("Attatching collider script to scene bb...");
-            bbColliderScript =  activeCubeHolder.AddComponent<BBCollider>();
+            Plugin.Log.Debug("Attatching collider script to the sabers...");
+            try
+            {
+                //bbColliderScript = colliderCubeActive.AddComponent<BBCollider>();
+                rSaberCollider = rSaber.gameObject.AddComponent<BBCollider>();
+                lSaberCollider = lSaber.gameObject.AddComponent<BBCollider>();
+            } catch (Exception exception)
+            {
+                CriticalErrorHandler(true, 601, exception);
+            }
+            
+        }
+        private void RemoveColliderScript()
+        {
+            Plugin.Log.Debug("Removing collider scripts...");
+            Destroy(rSaberCollider);
+            Destroy(lSaberCollider);
         }
 
         private void ResetSaberPos()
@@ -617,11 +626,15 @@ namespace AntiLagMod
             if (whichSaber == SaberType.RightSaber)
             {
                 Plugin.Log.Warn("Right saber has left the bounding box.");
+                Instance.Pause();
+                Instance.SetText("Drift detected on right controler.", Color.blue);
                 
             }
             if (whichSaber == SaberType.LeftSaber)
             {
                 Plugin.Log.Warn("Left saber has left the bounding box.");
+                Instance.Pause();
+                Instance.SetText("Drift detected on right controler.", Color.red);
             }
         }
 
@@ -641,13 +654,22 @@ namespace AntiLagMod
             Plugin.Log.Debug("Critical Error: " + criticalError);
         }
 
-        
-        private void SetText(string message, Color color)
+        private void SetText(string message, Color color) // doesnt work???
         {
-            
+            Plugin.Log.Debug("Updating the text...");
+            TextObj.indicatorTMPText.text = message;
+            TextObj.indicatorTMPText.color = color;
+            StartCoroutine(ResetText());
         }
 
-        public static void ExternalCriticalError(string ScriptLocation = null, int lineNumber = 0, Exception exception = (Exception)null)
+        private IEnumerator ResetText()
+        {
+            yield return new WaitForSeconds(10);
+            Plugin.Log.Debug("Resettinng text...");
+            TextObj.indicatorTMPText.text = "";
+        }
+
+        public static void ExternalCriticalError(string ScriptLocation = null, int lineNumber = 0, Exception exception = null)
         {
             Plugin.Log.Warn("A critical error has been encountered in " + ScriptLocation +  ". ");
             Instance.CriticalErrorHandler(true, lineNumber, exception);

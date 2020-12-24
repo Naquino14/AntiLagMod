@@ -14,15 +14,16 @@ namespace AntiLagMod
         private Canvas dasCanvas;
         private Vector3 position = new Vector3(0.0f, 0.0f, 0.0f);
         private Vector3 scale = new Vector3(1.0f, 1.0f, 1.0f);
-        private Vector2 canvAnchorPos = new Vector2(0.0f, 0.0f);
-        private Vector2 canvScale = new Vector2(1.0f, 1.0f);
+        private Vector2 canvAnchorPos = new Vector3(0.0f, 0.0f, 0.0f);
+        private Vector2 canvScale = new Vector2(50f, 50f);
         private Vector3 rectTransformPos = new Vector3(0.0f, 0.0f, 0.0f);
 
-        private float textFontSize = 10f;
-        private static TMP_Text indicatorTMPText; 
-        private void OnLoad()
+        private float textFontSize = 20f;
+        public static TMP_Text indicatorTMPText; 
+        public static void OnLoad()
         {
-            new GameObject("IndTextObj").AddComponent<TextObj>();
+            TextObj Instance_ = new GameObject("IndTextObj").AddComponent<TextObj>();
+            Instance_.Create();
         }
         private void Awake() // make pub if didnt fire
         {
@@ -31,9 +32,9 @@ namespace AntiLagMod
         }
         public void Create()
         {
-            Plugin.Log.Debug("Creating text object");
             try
             {
+                Plugin.Log.Debug("Creating text object");
                 // setup text obj
                 gameObject.transform.localScale = scale;
                 dasCanvas = gameObject.AddComponent<Canvas>();

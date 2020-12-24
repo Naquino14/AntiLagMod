@@ -13,12 +13,9 @@ namespace AntiLagMod.StreamingAssets
         {
             Plugin.Log.Debug("BBCollider script successfully attatched.");
         }
-        void OnCollisionStay(Collider collider)
+        void OnTriggerExit(Collider collider)
         {
-            Plugin.Log.Debug("Saber " + collider.transform.name + " is in the phookin bb");
-        }
-        void OnCollisionExit(Collider collider)
-        {
+            Plugin.Log.Debug(collider.transform.name + " has left bb");
             if(collider.gameObject.transform.name == "RightSaber")
                 AntiLagModController.SabersLeftBB(AntiLagModController.SaberType.RightSaber);
             if (collider.gameObject.transform.name == "LeftSaber")
