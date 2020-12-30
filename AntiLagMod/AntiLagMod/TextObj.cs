@@ -23,11 +23,12 @@ namespace AntiLagMod
         public static void OnLoad()
         {
             TextObj Instance_ = new GameObject("IndTextObj").AddComponent<TextObj>();
-            Instance_.Create();
         }
         private void Awake() // make pub if didnt fire
         {
             Plugin.Log.Debug("TextObject Awake()");
+            Instance_.Create();
+            DontDestroyOnLoad(this);
 
         }
         public void Create()
