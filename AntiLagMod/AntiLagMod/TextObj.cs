@@ -19,10 +19,11 @@ namespace AntiLagMod
         private Vector3 rectTransformPos = new Vector3(0.0f, 0.0f, 0.0f);
 
         private float textFontSize = 20f;
-        public static TMP_Text indicatorTMPText; 
+        public static TMP_Text indicatorTMPText;
+        private static TextObj Instance_;
         public static void OnLoad()
         {
-            TextObj Instance_ = new GameObject("IndTextObj").AddComponent<TextObj>();
+            Instance_ = new GameObject("IndTextObj").AddComponent<TextObj>();
         }
         private void Awake() // make pub if didnt fire
         {
