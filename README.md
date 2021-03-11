@@ -1,3 +1,5 @@
+This project is now officially abandoned until further notice.
+
 # Anti-Lag-Mod
 An anti lag mod for Beatsaber. Pauses your game after a desired threshold of frames are dropped or certain tracking issues are detected.
 **NOTE THAT THIS IS A PRE-RELEASE AND MAY HAVE BUGS**
